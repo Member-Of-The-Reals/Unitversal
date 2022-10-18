@@ -13,30 +13,30 @@ the same type and converting between two units.
 To explore all units in the database, type "explore" into the search box. This
 can also be done by clicking the "Explore All Units" button in the settings.
 
-![Explore Query Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/Resources/Screenshots/Explore%20Query.png)
+![Explore Query Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/blob/main/Resources/Screenshots/Explore%20Query.png)
 
 To get information about a specific unit, type in the search box the unit name
 and double click the unit once it appears in the list below.
 
 >Example query: meter
 
-![Information Query Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/Resources/Screenshots/Information%20Query.png)
+![Information Query Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/blob/main/Resources/Screenshots/Information%20Query.png)
 
-![Unit Information Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/Resources/Screenshots/Unit%20Information.png)
+![Unit Information Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/blob/main/Resources/Screenshots/Unit%20Information.png)
 
 To convert one unit to all corresponding units, type in the search box a
 magnitude followed by the unit name.
 
 >Example query: 1 meter
 
-![Unit Information Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/Resources/Screenshots/Convert%20All%20Query.png)
+![Unit Information Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/blob/main/Resources/Screenshots/Convert%20All%20Query.png)
 
 To convert between two units, type in the search box a magnitude followed by the
 names of the two units where the names are separated by the word "to".
 
 >Example query: 1 meter to foot
 
-![Convert To Query Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/Resources/Screenshots/Convert%20To%20Query.png)
+![Convert To Query Screenshot](https://github.com/Member-Of-The-Reals/Unitversal/blob/main/Resources/Screenshots/Convert%20To%20Query.png)
 
 Symbols, abbreviations, and minor misspellings will still be recognized by the
 app.
