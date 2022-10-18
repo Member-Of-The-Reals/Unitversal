@@ -427,7 +427,7 @@ namespace Unitversal
         }
     }
     //
-    //뿓뿓뿓뿓뿓뿓뿓뿓뿓뿓String Formatting뿓뿓뿓뿓뿓뿓뿓뿓뿓뿓
+    //혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰String Formatting혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰혰
     //
     public partial class MainWindow : Form
     {
