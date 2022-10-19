@@ -427,7 +427,7 @@ namespace Unitversal
         }
     }
     //
-    //覧覧覧覧覧覧覧覧覧覧String Formatting覧覧覧覧覧覧覧覧覧覧
+    //————————————————————String Formatting————————————————————
     //
     public partial class MainWindow : Form
     {
