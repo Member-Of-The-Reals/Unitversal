@@ -316,47 +316,43 @@ namespace Unitversal
             this.SortMenu.Name = "SortMenu";
             this.SortMenu.ShowCheckMargin = true;
             this.SortMenu.ShowImageMargin = false;
-            this.SortMenu.Size = new System.Drawing.Size(137, 98);
+            this.SortMenu.Size = new System.Drawing.Size(181, 120);
             this.SortMenu.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.SortMenu_Closed);
             // 
             // SortAscending
             // 
             this.SortAscending.CheckOnClick = true;
             this.SortAscending.Name = "SortAscending";
-            this.SortAscending.Size = new System.Drawing.Size(136, 22);
+            this.SortAscending.Size = new System.Drawing.Size(180, 22);
             this.SortAscending.Text = "Ascending";
             this.SortAscending.Click += new System.EventHandler(this.SortAscending_Click);
             // 
             // SortDescending
             // 
-            this.SortDescending.Checked = true;
             this.SortDescending.CheckOnClick = true;
-            this.SortDescending.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SortDescending.Name = "SortDescending";
-            this.SortDescending.Size = new System.Drawing.Size(136, 22);
+            this.SortDescending.Size = new System.Drawing.Size(180, 22);
             this.SortDescending.Text = "Descending";
             this.SortDescending.Click += new System.EventHandler(this.SortDescending_Click);
             // 
             // SortSeparator
             // 
             this.SortSeparator.Name = "SortSeparator";
-            this.SortSeparator.Size = new System.Drawing.Size(133, 6);
+            this.SortSeparator.Size = new System.Drawing.Size(177, 6);
             // 
             // SortUnit
             // 
             this.SortUnit.CheckOnClick = true;
             this.SortUnit.Name = "SortUnit";
-            this.SortUnit.Size = new System.Drawing.Size(136, 22);
+            this.SortUnit.Size = new System.Drawing.Size(180, 22);
             this.SortUnit.Text = "Unit";
             this.SortUnit.Click += new System.EventHandler(this.SortUnit_Click);
             // 
             // SortMagnitude
             // 
-            this.SortMagnitude.Checked = true;
             this.SortMagnitude.CheckOnClick = true;
-            this.SortMagnitude.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SortMagnitude.Name = "SortMagnitude";
-            this.SortMagnitude.Size = new System.Drawing.Size(136, 22);
+            this.SortMagnitude.Size = new System.Drawing.Size(180, 22);
             this.SortMagnitude.Text = "Magnitude";
             this.SortMagnitude.Click += new System.EventHandler(this.SortMagnitude_Click);
             // 
