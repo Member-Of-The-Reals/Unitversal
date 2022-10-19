@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.Data.Sqlite;
@@ -107,7 +107,15 @@ namespace Unitversal
                         while (Reader.Read())
                         {
                             //Required values: Unit, Type, SI Equivalent
-                            if (Reader[0].GetType() == typeof(DBNull) || Reader[1].GetType() == typeof(DBNull) || Reader[2].GetType() == typeof(DBNull))
+                            if (
+                                Reader[0].GetType() == typeof(DBNull)
+                                ||
+                                Reader[1].GetType() == typeof(DBNull)
+                                ||
+                                Reader[2].GetType() == typeof(DBNull)
+                                ||
+                                !BigDecimal.TryParse(Reader.GetString(2), out _)
+                            )
                             {
                                 continue;
                             }
