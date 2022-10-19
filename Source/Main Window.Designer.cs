@@ -321,7 +321,9 @@ namespace Unitversal
             // 
             // SortAscending
             // 
+            this.SortAscending.Checked = true;
             this.SortAscending.CheckOnClick = true;
+            this.SortAscending.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SortAscending.Name = "SortAscending";
             this.SortAscending.Size = new System.Drawing.Size(180, 22);
             this.SortAscending.Text = "Ascending";
@@ -342,7 +344,9 @@ namespace Unitversal
             // 
             // SortUnit
             // 
+            this.SortUnit.Checked = true;
             this.SortUnit.CheckOnClick = true;
+            this.SortUnit.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SortUnit.Name = "SortUnit";
             this.SortUnit.Size = new System.Drawing.Size(180, 22);
             this.SortUnit.Text = "Unit";
