@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -832,13 +832,25 @@ namespace Unitversal
                 }
                 else
                 {
-                    return;
+                    //If called using save button
+                    if (PreviousState.SelectedUnit.Length > 0)
+                    {
+                        Item = PreviousState.SelectedUnit;
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             }
             if (AppState.UnitList.ContainsKey(Item))
             {
                 //Check if selected unit is same as previous
-                if (PreviousState.SelectedUnit == AppState.UnitList[Item])
+                if (
+                    AppState.UnitList[Item] == PreviousState.SelectedUnit
+                    &&
+                    Settings.DecimalSeparator == PreviousState.DecimalSeparator
+                )
                 {
                     //Remove focus to keep contents at top
                     Title.Focus();
@@ -847,6 +859,7 @@ namespace Unitversal
                     DescriptionText.ScrollToCaret();
                     //Show cached text
                     AboutDisplay.Visible = true;
+                    AboutDisplay.BringToFront();
                 }
                 else
                 {
@@ -971,7 +984,8 @@ namespace Unitversal
                     DescriptionText.SelectionStart = DescriptionText.TextLength;
                     DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
                     DescriptionText.AppendText(" ");
-                    DescriptionText.AppendText(Unit.SI);
+                    DescriptionText.AppendText(Unit.SI.Replace('.', char.Parse(Settings.DecimalSeparator)));
+                    PreviousState.DecimalSeparator = Settings.DecimalSeparator;
                     if (AppState.InexactValues.ContainsKey(Unit.Unit))
                     {
                         DescriptionText.AppendText("...");
@@ -989,6 +1003,7 @@ namespace Unitversal
                     DescriptionText.AppendText(Unit.Description);
                     //Make about display visible
                     AboutDisplay.Visible = true;
+                    AboutDisplay.BringToFront();
                 }
             }
         }
@@ -1001,6 +1016,7 @@ namespace Unitversal
         private void SettingsButton_Click(object sender, EventArgs e)
         {
             SettingsPanel.Visible = true;
+            SettingsPanel.BringToFront();
         }
         //
         //————————————————————Settings Window————————————————————
@@ -1056,7 +1072,7 @@ namespace Unitversal
                 DecimalSeparatorEntry.Text = Settings.DecimalSeparator;
                 return;
             }
-            //Show settings panel
+            //Hide settings panel
             SettingsPanel.Visible = false;
             SettingsPanel.VerticalScroll.Value = 0; //Scroll to top
             //General
@@ -1087,6 +1103,11 @@ namespace Unitversal
             if (SearchView.Items.Count > 0)
             {
                 GetAddResults();
+            }
+            //Update about display
+            if (AboutDisplay.Visible)
+            {
+                SearchView_ItemActivate(this, EventArgs.Empty);
             }
         }
         private void CancButton_Click(object sender, EventArgs e)
