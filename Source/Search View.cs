@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -436,11 +436,11 @@ namespace Unitversal
             BigDecimal Unit2SI = 1;
             if (AppState.InexactValues.ContainsKey(AppState.Unit1.Unit))
             {
-                Unit1SI = AppState.Magnitude * BigDecimal.Parse(AppState.InexactValues[AppState.Unit1.Unit], char.Parse(Settings.DecimalSeparator));
+                Unit1SI = AppState.Magnitude * BigDecimal.Parse(AppState.InexactValues[AppState.Unit1.Unit]);
             }
             else
             {
-                Unit1SI = AppState.Magnitude * BigDecimal.Parse(AppState.Unit1.SI, char.Parse(Settings.DecimalSeparator));
+                Unit1SI = AppState.Magnitude * BigDecimal.Parse(AppState.Unit1.SI);
             }
             BigDecimal Conversion;
             string ConversionString;
@@ -480,11 +480,11 @@ namespace Unitversal
                     //Get unit 2 SI equivalent
                     if (AppState.InexactValues.ContainsKey(Item.Unit))
                     {
-                        Unit2SI = BigDecimal.Parse(AppState.InexactValues[Item.Unit], char.Parse(Settings.DecimalSeparator));
+                        Unit2SI = BigDecimal.Parse(AppState.InexactValues[Item.Unit]);
                     }
                     else
                     {
-                        Unit2SI = BigDecimal.Parse(Item.SI, char.Parse(Settings.DecimalSeparator));
+                        Unit2SI = BigDecimal.Parse(Item.SI);
                     }
                     //Conversions
                     if (
@@ -544,11 +544,11 @@ namespace Unitversal
                         //Get unit 2 SI equivalent
                         if (AppState.InexactValues.ContainsKey(x.Key))
                         {
-                            Unit2SI = BigDecimal.Parse(AppState.InexactValues[x.Key], char.Parse(Settings.DecimalSeparator));
+                            Unit2SI = BigDecimal.Parse(AppState.InexactValues[x.Key]);
                         }
                         else
                         {
-                            Unit2SI = BigDecimal.Parse(x.Value.SI, char.Parse(Settings.DecimalSeparator));
+                            Unit2SI = BigDecimal.Parse(x.Value.SI);
                         }
                         //Conversions
                         if (
