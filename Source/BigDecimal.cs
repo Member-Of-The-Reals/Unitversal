@@ -427,7 +427,7 @@ namespace Unitversal
         }
     }
     //
-    //String Formatting
+    //覧覧覧覧覧覧覧覧覧覧String Formatting覧覧覧覧覧覧覧覧覧覧
     //
     public partial class MainWindow : Form
     {
@@ -445,7 +445,7 @@ namespace Unitversal
                 }
                 else
                 {
-                    NumberString = NumberString.Insert(Exponent, Settings.DecimalSeparator);
+                    NumberString = NumberString.Insert(Exponent, ".");
                 }
             }
             else if (Number.Exponent >= 0)
