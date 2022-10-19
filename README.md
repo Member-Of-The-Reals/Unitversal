@@ -64,4 +64,4 @@ Public License v3.0. See LICENSE.txt for license text.
 
 Contact: memberofthereals@gmail.com
 
-© 2022 Member of the Reals
+© 2022 Member Of The Reals
