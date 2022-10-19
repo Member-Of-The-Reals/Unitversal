@@ -1,4 +1,4 @@
-﻿
+
 namespace Unitversal
 {
     partial class MainWindow
@@ -966,9 +966,9 @@ namespace Unitversal
             this.AuthorLabel.Location = new System.Drawing.Point(22, 689);
             this.AuthorLabel.Margin = new System.Windows.Forms.Padding(0);
             this.AuthorLabel.Name = "AuthorLabel";
-            this.AuthorLabel.Size = new System.Drawing.Size(157, 15);
+            this.AuthorLabel.Size = new System.Drawing.Size(161, 15);
             this.AuthorLabel.TabIndex = 42;
-            this.AuthorLabel.Text = "© 2022 Member of the Reals";
+            this.AuthorLabel.Text = "© 2022 Member Of The Reals";
             // 
             // SaveButton
             // 
