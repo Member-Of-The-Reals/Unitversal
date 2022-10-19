@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -378,8 +378,9 @@ namespace Unitversal
         //Sort menu
         public static string SortOrder;
         public static string SortBy;
-        //Search view
+        //About display
         public static string SelectedUnit;
+        public static string DecimalSeparator;
     }
     /// <summary>
     /// Stores the settings of the app which will be stored in a file.
@@ -454,24 +455,24 @@ namespace Unitversal
         /// </summary>
         private static void CalculateInexactValues()
         {
-            BigDecimal Pi = BigDecimal.Parse("3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812", char.Parse(Settings.DecimalSeparator));
+            BigDecimal Pi = BigDecimal.Parse("3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812");
             BigDecimal Degree = Pi / 180;
-            BigDecimal CandelaSquareInch = 1 / BigDecimal.Parse("0.00064516", char.Parse(Settings.DecimalSeparator));
-            BigDecimal Neper = BigDecimal.Parse("0.868588963806503655302257837833210164588794011607333132228907566331729298417741549458449898676863496637412213489532607467283358574317927813138442129325", char.Parse(Settings.DecimalSeparator));
+            BigDecimal CandelaSquareInch = 1 / BigDecimal.Parse("0.00064516");
+            BigDecimal Neper = BigDecimal.Parse("0.868588963806503655302257837833210164588794011607333132228907566331729298417741549458449898676863496637412213489532607467283358574317927813138442129325");
             BigDecimal PerMinute = (BigDecimal)1 / 60;
             BigDecimal PerHour = (BigDecimal)1 / 3600;
-            BigDecimal Inch = BigDecimal.Parse("0.0254", char.Parse(Settings.DecimalSeparator));
-            BigDecimal FootPerHour = BigDecimal.Parse("0.3048", char.Parse(Settings.DecimalSeparator)) * PerHour;
-            BigDecimal Parsec = BigDecimal.Parse("30856775814913672.7891393795779647161073192116040917980140401922770232921869992968698321353388065559933270120238005882778324746263076049569688909836599", char.Parse(Settings.DecimalSeparator));
+            BigDecimal Inch = BigDecimal.Parse("0.0254");
+            BigDecimal FootPerHour = BigDecimal.Parse("0.3048") * PerHour;
+            BigDecimal Parsec = BigDecimal.Parse("30856775814913672.7891393795779647161073192116040917980140401922770232921869992968698321353388065559933270120238005882778324746263076049569688909836599");
             BigDecimal kmPerHour = (BigDecimal)1000 * PerHour;
-            BigDecimal kmPerGallon = 1000 / BigDecimal.Parse("0.003785411784", char.Parse(Settings.DecimalSeparator));
-            BigDecimal PSI = BigDecimal.Parse("4.4482216152605", char.Parse(Settings.DecimalSeparator)) / BigDecimal.Parse("0.00064516", char.Parse(Settings.DecimalSeparator));
+            BigDecimal kmPerGallon = 1000 / BigDecimal.Parse("0.003785411784");
+            BigDecimal PSI = BigDecimal.Parse("4.4482216152605") / BigDecimal.Parse("0.00064516");
             BigDecimal Knot = (BigDecimal)1852 * PerHour;
-            BigDecimal LitrePerMinute = BigDecimal.Parse("0.001", char.Parse(Settings.DecimalSeparator)) * PerMinute;
+            BigDecimal LitrePerMinute = BigDecimal.Parse("0.001") * PerMinute;
             BigDecimal LongAT = (BigDecimal)98 / 3000;
-            BigDecimal MilePerDay = BigDecimal.Parse("1609.344", char.Parse(Settings.DecimalSeparator)) / 86400;
+            BigDecimal MilePerDay = BigDecimal.Parse("1609.344") / 86400;
             BigDecimal Torr = (BigDecimal)101325 / 760;
-            BigDecimal SecondPerFoot = (BigDecimal)1 / BigDecimal.Parse("0.3048", char.Parse(Settings.DecimalSeparator));
+            BigDecimal SecondPerFoot = (BigDecimal)1 / BigDecimal.Parse("0.3048");
             BigDecimal SecondPerMile = SecondPerFoot / 5280;
             BigDecimal RightAngle = Pi / 2;
             BigDecimal SurveyFoot = (BigDecimal)1200 / 3937;
@@ -479,10 +480,10 @@ namespace Unitversal
             BigDecimal SquareSurveyMile = SurveyMile * SurveyMile;
             BigDecimal ShortAT = (BigDecimal)175 / 6000;
             BigDecimal SquareSurveyFoot = SurveyFoot * SurveyFoot;
-            BigDecimal Trit = BigDecimal.Parse("1.58496250072115618145373894394781650875981440769248106045575265454109822779435856252228047491808824209098066247505916734371755244106092482214208395062", char.Parse(Settings.DecimalSeparator));
+            BigDecimal Trit = BigDecimal.Parse("1.58496250072115618145373894394781650875981440769248106045575265454109822779435856252228047491808824209098066247505916734371755244106092482214208395062");
             BigDecimal CubicSurveyFoot = SurveyFoot * SquareSurveyFoot;
-            BigDecimal GallonPerHour = BigDecimal.Parse("0.003785411784", char.Parse(Settings.DecimalSeparator)) * PerHour;
-            BigDecimal MilePerGallon = BigDecimal.Parse("1609.344", char.Parse(Settings.DecimalSeparator)) / BigDecimal.Parse("0.003785411784", char.Parse(Settings.DecimalSeparator));
+            BigDecimal GallonPerHour = BigDecimal.Parse("0.003785411784") * PerHour;
+            BigDecimal MilePerGallon = BigDecimal.Parse("1609.344") / BigDecimal.Parse("0.003785411784");
             AppState.InexactValues = new Dictionary<string, string>()
             {
                 { "Arcminute", BigDecimalNaturalFormat(Degree / 60) },
