@@ -14,7 +14,7 @@ Bug Fixes
 > Fixed issue with incorrect area conversions.
 > Fixed issue where the interpretation text appears when resizing window despite
   results being cleared.
-> Fixed issue where double clicking labels undesirably copys its text to
+> Fixed issue where double clicking labels undesirably copies its text to
   clipboard.
 > Fixed currency update loop.
 
