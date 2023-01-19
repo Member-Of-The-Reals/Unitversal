@@ -1,40 +1,54 @@
+﻿namespace Unitversal;
 
-namespace Unitversal
+//Disables automatically copying text when double clicking labels
+public class LabelNoCopy : Label
 {
-    partial class MainWindow
+    //It appears that double click copy relies on base.Text. The fix is to use a different variable.
+    private string text;
+    public override string Text
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
-
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
+        get => text;
+        set
         {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
+            text = value;
+            OnTextChanged(EventArgs.Empty);
         }
+    }
+}
+partial class MainWindow
+{
+    /// <summary>
+    ///  Required designer variable.
+    /// </summary>
+    private System.ComponentModel.IContainer components = null;
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
+    /// <summary>
+    ///  Clean up any resources being used.
+    /// </summary>
+    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && (components != null))
         {
+            components.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
+    #region Windows Form Designer generated code
+
+    /// <summary>
+    ///  Required method for Designer support - do not modify
+    ///  the contents of this method with the code editor.
+    /// </summary>
+    private void InitializeComponent()
+    {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.CloseButton = new System.Windows.Forms.Button();
             this.MaximizeButton = new System.Windows.Forms.Button();
             this.MinimizeButton = new System.Windows.Forms.Button();
-            this.Title = new System.Windows.Forms.Label();
+            this.Title = new Unitversal.LabelNoCopy();
             this.TitleBar = new System.Windows.Forms.Panel();
             this.SearchBox = new System.Windows.Forms.TextBox();
             this.RightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -43,9 +57,10 @@ namespace Unitversal
             this.RightClickCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.RightClickPaste = new System.Windows.Forms.ToolStripMenuItem();
             this.RightClickSelectAll = new System.Windows.Forms.ToolStripMenuItem();
-            this.SettingsButton = new System.Windows.Forms.Button();
-            this.InterpretLabel = new System.Windows.Forms.Label();
+            this.ClearSearchButton = new System.Windows.Forms.Button();
+            this.InterpretLabel = new Unitversal.LabelNoCopy();
             this.InterpretToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.SettingsButton = new System.Windows.Forms.Button();
             this.SortButton = new System.Windows.Forms.Button();
             this.SortMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SortAscending = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,54 +69,62 @@ namespace Unitversal
             this.SortUnit = new System.Windows.Forms.ToolStripMenuItem();
             this.SortMagnitude = new System.Windows.Forms.ToolStripMenuItem();
             this.SearchView = new System.Windows.Forms.ListView();
-            this.AboutDisplay = new System.Windows.Forms.Panel();
+            this.InfoDisplay = new System.Windows.Forms.Panel();
             this.DescriptionText = new System.Windows.Forms.RichTextBox();
-            this.ReturnButton = new System.Windows.Forms.Button();
+            this.InfoReturnButton = new System.Windows.Forms.Button();
             this.SettingsPanel = new System.Windows.Forms.Panel();
-            this.SettingsLabel = new System.Windows.Forms.Label();
-            this.GeneralSettingsLabel = new System.Windows.Forms.Label();
+            this.SettingsLabel = new Unitversal.LabelNoCopy();
+            this.GeneralSettingsLabel = new Unitversal.LabelNoCopy();
             this.PositionCheckbox = new System.Windows.Forms.CheckBox();
             this.SizeCheckbox = new System.Windows.Forms.CheckBox();
             this.CurrencyCheckbox = new System.Windows.Forms.CheckBox();
-            this.ConversionSettingsLabel = new System.Windows.Forms.Label();
-            this.SignificantFiguresLabel = new System.Windows.Forms.Label();
+            this.ConversionSettingsLabel = new Unitversal.LabelNoCopy();
+            this.SignificantFiguresLabel = new Unitversal.LabelNoCopy();
             this.SignificantFiguresEntry = new System.Windows.Forms.NumericUpDown();
-            this.DecimalSeparatorLabel = new System.Windows.Forms.Label();
+            this.DecimalSeparatorLabel = new Unitversal.LabelNoCopy();
             this.DecimalSeparatorEntry = new System.Windows.Forms.TextBox();
-            this.IntegerGroupSeparatorLabel = new System.Windows.Forms.Label();
+            this.IntegerGroupSeparatorLabel = new Unitversal.LabelNoCopy();
             this.IntegerGroupSeparatorEntry = new System.Windows.Forms.TextBox();
-            this.IntegerGroupSizeLabel = new System.Windows.Forms.Label();
+            this.IntegerGroupSizeLabel = new Unitversal.LabelNoCopy();
             this.IntegerGroupSizeEntry = new System.Windows.Forms.NumericUpDown();
-            this.DecimalGroupSeparatorLabel = new System.Windows.Forms.Label();
+            this.DecimalGroupSeparatorLabel = new Unitversal.LabelNoCopy();
             this.DecimalGroupSeparatorEntry = new System.Windows.Forms.TextBox();
-            this.DecimalGroupSizeLabel = new System.Windows.Forms.Label();
+            this.DecimalGroupSizeLabel = new Unitversal.LabelNoCopy();
             this.DecimalGroupSizeEntry = new System.Windows.Forms.NumericUpDown();
-            this.ScientificNotationLabel = new System.Windows.Forms.Label();
-            this.LargeMagnitudeLabel = new System.Windows.Forms.Label();
+            this.ScientificNotationLabel = new Unitversal.LabelNoCopy();
+            this.LargeMagnitudeLabel = new Unitversal.LabelNoCopy();
             this.LargeMagnitudeEntry = new System.Windows.Forms.NumericUpDown();
-            this.LargeExponentLabel = new System.Windows.Forms.Label();
+            this.LargeExponentLabel = new Unitversal.LabelNoCopy();
             this.LargeExponentEntry = new System.Windows.Forms.NumericUpDown();
-            this.SmallMagnitudeLabel = new System.Windows.Forms.Label();
+            this.SmallMagnitudeLabel = new Unitversal.LabelNoCopy();
             this.SmallMagnitudeEntry = new System.Windows.Forms.NumericUpDown();
-            this.SmallExponentLabel = new System.Windows.Forms.Label();
+            this.SmallExponentLabel = new Unitversal.LabelNoCopy();
             this.SmallExponentEntry = new System.Windows.Forms.NumericUpDown();
-            this.AppearLabel = new System.Windows.Forms.Label();
+            this.AppearLabel = new Unitversal.LabelNoCopy();
             this.LightMode = new System.Windows.Forms.RadioButton();
             this.DarkMode = new System.Windows.Forms.RadioButton();
             this.SystemMode = new System.Windows.Forms.RadioButton();
-            this.HelpLabel = new System.Windows.Forms.Label();
+            this.HelpLabel = new Unitversal.LabelNoCopy();
             this.ExploreButton = new System.Windows.Forms.Button();
             this.UpdateCurrencyButton = new System.Windows.Forms.Button();
-            this.CurrencyUpdateText = new System.Windows.Forms.Label();
-            this.AboutLabel = new System.Windows.Forms.Label();
-            this.AppNameLabel = new System.Windows.Forms.Label();
-            this.AuthorLabel = new System.Windows.Forms.Label();
+            this.CurrencyUpdateText = new Unitversal.LabelNoCopy();
+            this.AboutLabel = new Unitversal.LabelNoCopy();
+            this.AppAuthorText = new System.Windows.Forms.TextBox();
+            this.AboutButton = new System.Windows.Forms.Button();
             this.SaveButton = new System.Windows.Forms.Button();
             this.CancButton = new System.Windows.Forms.Button();
+            this.AboutDisplay = new System.Windows.Forms.Panel();
+            this.NoticeButton = new System.Windows.Forms.Button();
+            this.NoticeTextBox = new System.Windows.Forms.TextBox();
+            this.LicenseButton = new System.Windows.Forms.Button();
+            this.LicenseTextBox = new System.Windows.Forms.TextBox();
+            this.ChangelogButton = new System.Windows.Forms.Button();
+            this.ChangelogTextBox = new System.Windows.Forms.TextBox();
+            this.AboutReturnButton = new System.Windows.Forms.Button();
             this.TitleBar.SuspendLayout();
             this.RightClickMenu.SuspendLayout();
             this.SortMenu.SuspendLayout();
-            this.AboutDisplay.SuspendLayout();
+            this.InfoDisplay.SuspendLayout();
             this.SettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SignificantFiguresEntry)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IntegerGroupSizeEntry)).BeginInit();
@@ -110,6 +133,7 @@ namespace Unitversal
             ((System.ComponentModel.ISupportInitialize)(this.LargeExponentEntry)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SmallMagnitudeEntry)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SmallExponentEntry)).BeginInit();
+            this.AboutDisplay.SuspendLayout();
             this.SuspendLayout();
             // 
             // CloseButton
@@ -248,6 +272,48 @@ namespace Unitversal
             this.RightClickSelectAll.Text = "Select All";
             this.RightClickSelectAll.Click += new System.EventHandler(this.RightClickSelectAll_Click);
             // 
+            // ClearSearchButton
+            // 
+            this.ClearSearchButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ClearSearchButton.FlatAppearance.BorderSize = 0;
+            this.ClearSearchButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ClearSearchButton.Font = new System.Drawing.Font("Segoe MDL2 Assets", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ClearSearchButton.Location = new System.Drawing.Point(307, 41);
+            this.ClearSearchButton.Name = "ClearSearchButton";
+            this.ClearSearchButton.Size = new System.Drawing.Size(26, 26);
+            this.ClearSearchButton.TabIndex = 0;
+            this.ClearSearchButton.TabStop = false;
+            this.ClearSearchButton.Text = "";
+            this.ClearSearchButton.UseVisualStyleBackColor = true;
+            this.ClearSearchButton.Visible = false;
+            this.ClearSearchButton.Click += new System.EventHandler(this.ClearSearchButton_Click);
+            // 
+            // InterpretLabel
+            // 
+            this.InterpretLabel.AutoSize = true;
+            this.InterpretLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.InterpretLabel.Location = new System.Drawing.Point(20, 76);
+            this.InterpretLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.InterpretLabel.MaximumSize = new System.Drawing.Size(297, 15);
+            this.InterpretLabel.MinimumSize = new System.Drawing.Size(0, 15);
+            this.InterpretLabel.Name = "InterpretLabel";
+            this.InterpretLabel.Size = new System.Drawing.Size(0, 15);
+            this.InterpretLabel.TabIndex = 7;
+            this.InterpretLabel.Text = null;
+            this.InterpretLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.InterpretLabel.TextChanged += new System.EventHandler(this.InterpretLabel_TextChanged);
+            this.InterpretLabel.DoubleClick += new System.EventHandler(this.InterpretLabel_DoubleClick);
+            this.InterpretLabel.MouseLeave += new System.EventHandler(this.InterpretLabel_MouseLeave);
+            this.InterpretLabel.MouseHover += new System.EventHandler(this.InterpretLabel_MouseHover);
+            // 
+            // InterpretToolTip
+            // 
+            this.InterpretToolTip.AutomaticDelay = 0;
+            this.InterpretToolTip.BackColor = System.Drawing.SystemColors.Window;
+            this.InterpretToolTip.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.InterpretToolTip.OwnerDraw = true;
+            this.InterpretToolTip.Draw += new System.Windows.Forms.DrawToolTipEventHandler(this.InterpretToolTip_Draw);
+            // 
             // SettingsButton
             // 
             this.SettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -263,34 +329,6 @@ namespace Unitversal
             this.SettingsButton.TabIndex = 6;
             this.SettingsButton.Text = "⚙";
             this.SettingsButton.Click += new System.EventHandler(this.SettingsButton_Click);
-            // 
-            // InterpretLabel
-            // 
-            this.InterpretLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.InterpretLabel.AutoSize = true;
-            this.InterpretLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.InterpretLabel.Location = new System.Drawing.Point(20, 76);
-            this.InterpretLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.InterpretLabel.MaximumSize = new System.Drawing.Size(297, 15);
-            this.InterpretLabel.MinimumSize = new System.Drawing.Size(0, 15);
-            this.InterpretLabel.Name = "InterpretLabel";
-            this.InterpretLabel.Size = new System.Drawing.Size(0, 15);
-            this.InterpretLabel.TabIndex = 7;
-            this.InterpretLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.InterpretLabel.TextChanged += new System.EventHandler(this.InterpretLabel_TextChanged);
-            this.InterpretLabel.DoubleClick += new System.EventHandler(this.InterpretLabel_DoubleClick);
-            this.InterpretLabel.MouseLeave += new System.EventHandler(this.InterpretLabel_MouseLeave);
-            this.InterpretLabel.MouseHover += new System.EventHandler(this.InterpretLabel_MouseHover);
-            // 
-            // InterpretToolTip
-            // 
-            this.InterpretToolTip.AutomaticDelay = 0;
-            this.InterpretToolTip.BackColor = System.Drawing.SystemColors.Window;
-            this.InterpretToolTip.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.InterpretToolTip.OwnerDraw = true;
-            this.InterpretToolTip.Draw += new System.Windows.Forms.DrawToolTipEventHandler(this.InterpretToolTip_Draw);
             // 
             // SortButton
             // 
@@ -316,7 +354,7 @@ namespace Unitversal
             this.SortMenu.Name = "SortMenu";
             this.SortMenu.ShowCheckMargin = true;
             this.SortMenu.ShowImageMargin = false;
-            this.SortMenu.Size = new System.Drawing.Size(181, 120);
+            this.SortMenu.Size = new System.Drawing.Size(137, 98);
             this.SortMenu.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.SortMenu_Closed);
             // 
             // SortAscending
@@ -325,7 +363,7 @@ namespace Unitversal
             this.SortAscending.CheckOnClick = true;
             this.SortAscending.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SortAscending.Name = "SortAscending";
-            this.SortAscending.Size = new System.Drawing.Size(180, 22);
+            this.SortAscending.Size = new System.Drawing.Size(136, 22);
             this.SortAscending.Text = "Ascending";
             this.SortAscending.Click += new System.EventHandler(this.SortAscending_Click);
             // 
@@ -333,14 +371,14 @@ namespace Unitversal
             // 
             this.SortDescending.CheckOnClick = true;
             this.SortDescending.Name = "SortDescending";
-            this.SortDescending.Size = new System.Drawing.Size(180, 22);
+            this.SortDescending.Size = new System.Drawing.Size(136, 22);
             this.SortDescending.Text = "Descending";
             this.SortDescending.Click += new System.EventHandler(this.SortDescending_Click);
             // 
             // SortSeparator
             // 
             this.SortSeparator.Name = "SortSeparator";
-            this.SortSeparator.Size = new System.Drawing.Size(177, 6);
+            this.SortSeparator.Size = new System.Drawing.Size(133, 6);
             // 
             // SortUnit
             // 
@@ -348,7 +386,7 @@ namespace Unitversal
             this.SortUnit.CheckOnClick = true;
             this.SortUnit.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SortUnit.Name = "SortUnit";
-            this.SortUnit.Size = new System.Drawing.Size(180, 22);
+            this.SortUnit.Size = new System.Drawing.Size(136, 22);
             this.SortUnit.Text = "Unit";
             this.SortUnit.Click += new System.EventHandler(this.SortUnit_Click);
             // 
@@ -356,7 +394,7 @@ namespace Unitversal
             // 
             this.SortMagnitude.CheckOnClick = true;
             this.SortMagnitude.Name = "SortMagnitude";
-            this.SortMagnitude.Size = new System.Drawing.Size(180, 22);
+            this.SortMagnitude.Size = new System.Drawing.Size(136, 22);
             this.SortMagnitude.Text = "Magnitude";
             this.SortMagnitude.Click += new System.EventHandler(this.SortMagnitude_Click);
             // 
@@ -380,18 +418,18 @@ namespace Unitversal
             this.SearchView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SearchView_KeyDown);
             this.SearchView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.SearchView_MouseUp);
             // 
-            // AboutDisplay
+            // InfoDisplay
             // 
-            this.AboutDisplay.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.InfoDisplay.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.AboutDisplay.Controls.Add(this.DescriptionText);
-            this.AboutDisplay.Controls.Add(this.ReturnButton);
-            this.AboutDisplay.Location = new System.Drawing.Point(20, 101);
-            this.AboutDisplay.Name = "AboutDisplay";
-            this.AboutDisplay.Size = new System.Drawing.Size(360, 232);
-            this.AboutDisplay.TabIndex = 10;
-            this.AboutDisplay.Visible = false;
+            this.InfoDisplay.Controls.Add(this.DescriptionText);
+            this.InfoDisplay.Controls.Add(this.InfoReturnButton);
+            this.InfoDisplay.Location = new System.Drawing.Point(20, 101);
+            this.InfoDisplay.Name = "InfoDisplay";
+            this.InfoDisplay.Size = new System.Drawing.Size(360, 232);
+            this.InfoDisplay.TabIndex = 10;
+            this.InfoDisplay.Visible = false;
             // 
             // DescriptionText
             // 
@@ -407,20 +445,21 @@ namespace Unitversal
             this.DescriptionText.Size = new System.Drawing.Size(340, 188);
             this.DescriptionText.TabIndex = 11;
             this.DescriptionText.Text = "";
+            this.DescriptionText.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.DescriptionText_LinkClicked);
             this.DescriptionText.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DescriptionText_MouseUp);
             // 
-            // ReturnButton
+            // InfoReturnButton
             // 
-            this.ReturnButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.ReturnButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ReturnButton.Location = new System.Drawing.Point(153, 204);
-            this.ReturnButton.Margin = new System.Windows.Forms.Padding(0);
-            this.ReturnButton.Name = "ReturnButton";
-            this.ReturnButton.Size = new System.Drawing.Size(54, 24);
-            this.ReturnButton.TabIndex = 12;
-            this.ReturnButton.Text = "Return";
-            this.ReturnButton.UseVisualStyleBackColor = true;
-            this.ReturnButton.Click += new System.EventHandler(this.ReturnButton_Click);
+            this.InfoReturnButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.InfoReturnButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.InfoReturnButton.Location = new System.Drawing.Point(153, 204);
+            this.InfoReturnButton.Margin = new System.Windows.Forms.Padding(0);
+            this.InfoReturnButton.Name = "InfoReturnButton";
+            this.InfoReturnButton.Size = new System.Drawing.Size(54, 24);
+            this.InfoReturnButton.TabIndex = 12;
+            this.InfoReturnButton.Text = "Return";
+            this.InfoReturnButton.UseVisualStyleBackColor = true;
+            this.InfoReturnButton.Click += new System.EventHandler(this.ReturnButton_Click);
             // 
             // SettingsPanel
             // 
@@ -428,7 +467,7 @@ namespace Unitversal
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.SettingsPanel.AutoScroll = true;
-            this.SettingsPanel.AutoScrollMinSize = new System.Drawing.Size(0, 770);
+            this.SettingsPanel.AutoScrollMinSize = new System.Drawing.Size(0, 800);
             this.SettingsPanel.Controls.Add(this.SettingsLabel);
             this.SettingsPanel.Controls.Add(this.GeneralSettingsLabel);
             this.SettingsPanel.Controls.Add(this.PositionCheckbox);
@@ -465,8 +504,8 @@ namespace Unitversal
             this.SettingsPanel.Controls.Add(this.UpdateCurrencyButton);
             this.SettingsPanel.Controls.Add(this.CurrencyUpdateText);
             this.SettingsPanel.Controls.Add(this.AboutLabel);
-            this.SettingsPanel.Controls.Add(this.AppNameLabel);
-            this.SettingsPanel.Controls.Add(this.AuthorLabel);
+            this.SettingsPanel.Controls.Add(this.AppAuthorText);
+            this.SettingsPanel.Controls.Add(this.AboutButton);
             this.SettingsPanel.Controls.Add(this.SaveButton);
             this.SettingsPanel.Controls.Add(this.CancButton);
             this.SettingsPanel.Location = new System.Drawing.Point(1, 31);
@@ -921,7 +960,7 @@ namespace Unitversal
             this.UpdateCurrencyButton.Location = new System.Drawing.Point(26, 605);
             this.UpdateCurrencyButton.Name = "UpdateCurrencyButton";
             this.UpdateCurrencyButton.Size = new System.Drawing.Size(122, 24);
-            this.UpdateCurrencyButton.TabIndex = 34;
+            this.UpdateCurrencyButton.TabIndex = 33;
             this.UpdateCurrencyButton.Text = "Update Currencies";
             this.UpdateCurrencyButton.UseVisualStyleBackColor = true;
             this.UpdateCurrencyButton.Click += new System.EventHandler(this.UpdateCurrencyButton_Click);
@@ -935,6 +974,7 @@ namespace Unitversal
             this.CurrencyUpdateText.Name = "CurrencyUpdateText";
             this.CurrencyUpdateText.Size = new System.Drawing.Size(0, 15);
             this.CurrencyUpdateText.TabIndex = 39;
+            this.CurrencyUpdateText.Text = null;
             // 
             // AboutLabel
             // 
@@ -945,39 +985,43 @@ namespace Unitversal
             this.AboutLabel.Margin = new System.Windows.Forms.Padding(0);
             this.AboutLabel.Name = "AboutLabel";
             this.AboutLabel.Size = new System.Drawing.Size(56, 21);
-            this.AboutLabel.TabIndex = 40;
+            this.AboutLabel.TabIndex = 35;
             this.AboutLabel.Text = "About";
             // 
-            // AppNameLabel
+            // AppAuthorText
             // 
-            this.AppNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.AppNameLabel.AutoSize = true;
-            this.AppNameLabel.Location = new System.Drawing.Point(22, 669);
-            this.AppNameLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.AppNameLabel.Name = "AppNameLabel";
-            this.AppNameLabel.Size = new System.Drawing.Size(59, 15);
-            this.AppNameLabel.TabIndex = 41;
-            this.AppNameLabel.Text = "Unitversal";
+            this.AppAuthorText.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.AppAuthorText.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.AppAuthorText.Location = new System.Drawing.Point(22, 670);
+            this.AppAuthorText.Margin = new System.Windows.Forms.Padding(0);
+            this.AppAuthorText.Multiline = true;
+            this.AppAuthorText.Name = "AppAuthorText";
+            this.AppAuthorText.ReadOnly = true;
+            this.AppAuthorText.Size = new System.Drawing.Size(163, 31);
+            this.AppAuthorText.TabIndex = 41;
+            this.AppAuthorText.Text = "Unitversal\r\n© 2022 Member Of The Reals";
+            this.AppAuthorText.GotFocus += new System.EventHandler(this.AppAuthorText_GotFocus);
             // 
-            // AuthorLabel
+            // AboutButton
             // 
-            this.AuthorLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.AuthorLabel.AutoSize = true;
-            this.AuthorLabel.Location = new System.Drawing.Point(22, 689);
-            this.AuthorLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.AuthorLabel.Name = "AuthorLabel";
-            this.AuthorLabel.Size = new System.Drawing.Size(161, 15);
-            this.AuthorLabel.TabIndex = 42;
-            this.AuthorLabel.Text = "© 2022 Member Of The Reals";
+            this.AboutButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.AboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.AboutButton.Location = new System.Drawing.Point(26, 715);
+            this.AboutButton.Name = "AboutButton";
+            this.AboutButton.Size = new System.Drawing.Size(75, 24);
+            this.AboutButton.TabIndex = 38;
+            this.AboutButton.Text = "About";
+            this.AboutButton.UseVisualStyleBackColor = true;
+            this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
             // 
             // SaveButton
             // 
             this.SaveButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.SaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.SaveButton.Location = new System.Drawing.Point(126, 725);
+            this.SaveButton.Location = new System.Drawing.Point(127, 756);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(75, 24);
-            this.SaveButton.TabIndex = 35;
+            this.SaveButton.TabIndex = 39;
             this.SaveButton.Text = "Save";
             this.SaveButton.UseVisualStyleBackColor = true;
             this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
@@ -986,13 +1030,138 @@ namespace Unitversal
             // 
             this.CancButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.CancButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CancButton.Location = new System.Drawing.Point(211, 725);
+            this.CancButton.Location = new System.Drawing.Point(212, 756);
             this.CancButton.Name = "CancButton";
             this.CancButton.Size = new System.Drawing.Size(75, 24);
-            this.CancButton.TabIndex = 36;
+            this.CancButton.TabIndex = 40;
             this.CancButton.Text = "Cancel";
             this.CancButton.UseVisualStyleBackColor = true;
             this.CancButton.Click += new System.EventHandler(this.CancButton_Click);
+            // 
+            // AboutDisplay
+            // 
+            this.AboutDisplay.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.AboutDisplay.Controls.Add(this.NoticeButton);
+            this.AboutDisplay.Controls.Add(this.NoticeTextBox);
+            this.AboutDisplay.Controls.Add(this.LicenseButton);
+            this.AboutDisplay.Controls.Add(this.LicenseTextBox);
+            this.AboutDisplay.Controls.Add(this.ChangelogButton);
+            this.AboutDisplay.Controls.Add(this.ChangelogTextBox);
+            this.AboutDisplay.Controls.Add(this.AboutReturnButton);
+            this.AboutDisplay.Location = new System.Drawing.Point(1, 31);
+            this.AboutDisplay.Margin = new System.Windows.Forms.Padding(0);
+            this.AboutDisplay.Name = "AboutDisplay";
+            this.AboutDisplay.Size = new System.Drawing.Size(398, 318);
+            this.AboutDisplay.TabIndex = 41;
+            this.AboutDisplay.Visible = false;
+            // 
+            // NoticeButton
+            // 
+            this.NoticeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.NoticeButton.Location = new System.Drawing.Point(0, 0);
+            this.NoticeButton.Margin = new System.Windows.Forms.Padding(0);
+            this.NoticeButton.Name = "NoticeButton";
+            this.NoticeButton.Size = new System.Drawing.Size(54, 28);
+            this.NoticeButton.TabIndex = 14;
+            this.NoticeButton.Text = "Notice";
+            this.NoticeButton.UseVisualStyleBackColor = true;
+            this.NoticeButton.Click += new System.EventHandler(this.NoticeButton_Click);
+            // 
+            // NoticeTextBox
+            // 
+            this.NoticeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.NoticeTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.NoticeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.NoticeTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.NoticeTextBox.Location = new System.Drawing.Point(10, 30);
+            this.NoticeTextBox.Margin = new System.Windows.Forms.Padding(0);
+            this.NoticeTextBox.Multiline = true;
+            this.NoticeTextBox.Name = "NoticeTextBox";
+            this.NoticeTextBox.ReadOnly = true;
+            this.NoticeTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.NoticeTextBox.Size = new System.Drawing.Size(378, 259);
+            this.NoticeTextBox.TabIndex = 0;
+            this.NoticeTextBox.Text = resources.GetString("NoticeTextBox.Text");
+            this.NoticeTextBox.WordWrap = false;
+            // 
+            // LicenseButton
+            // 
+            this.LicenseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.LicenseButton.Location = new System.Drawing.Point(55, 0);
+            this.LicenseButton.Margin = new System.Windows.Forms.Padding(0);
+            this.LicenseButton.Name = "LicenseButton";
+            this.LicenseButton.Size = new System.Drawing.Size(64, 28);
+            this.LicenseButton.TabIndex = 15;
+            this.LicenseButton.Text = "License";
+            this.LicenseButton.UseVisualStyleBackColor = true;
+            this.LicenseButton.Click += new System.EventHandler(this.LicenseButton_Click);
+            // 
+            // LicenseTextBox
+            // 
+            this.LicenseTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LicenseTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.LicenseTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.LicenseTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.LicenseTextBox.Location = new System.Drawing.Point(10, 30);
+            this.LicenseTextBox.Margin = new System.Windows.Forms.Padding(0);
+            this.LicenseTextBox.Multiline = true;
+            this.LicenseTextBox.Name = "LicenseTextBox";
+            this.LicenseTextBox.ReadOnly = true;
+            this.LicenseTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.LicenseTextBox.Size = new System.Drawing.Size(378, 259);
+            this.LicenseTextBox.TabIndex = 1;
+            this.LicenseTextBox.Text = resources.GetString("LicenseTextBox.Text");
+            this.LicenseTextBox.WordWrap = false;
+            // 
+            // ChangelogButton
+            // 
+            this.ChangelogButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ChangelogButton.Location = new System.Drawing.Point(120, 0);
+            this.ChangelogButton.Margin = new System.Windows.Forms.Padding(0);
+            this.ChangelogButton.Name = "ChangelogButton";
+            this.ChangelogButton.Size = new System.Drawing.Size(76, 28);
+            this.ChangelogButton.TabIndex = 16;
+            this.ChangelogButton.Text = "Changelog";
+            this.ChangelogButton.UseVisualStyleBackColor = true;
+            this.ChangelogButton.Click += new System.EventHandler(this.ChangelogButton_Click);
+            // 
+            // ChangelogTextBox
+            // 
+            this.ChangelogTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ChangelogTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.ChangelogTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ChangelogTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ChangelogTextBox.Location = new System.Drawing.Point(10, 30);
+            this.ChangelogTextBox.Margin = new System.Windows.Forms.Padding(0);
+            this.ChangelogTextBox.Multiline = true;
+            this.ChangelogTextBox.Name = "ChangelogTextBox";
+            this.ChangelogTextBox.ReadOnly = true;
+            this.ChangelogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.ChangelogTextBox.Size = new System.Drawing.Size(378, 259);
+            this.ChangelogTextBox.TabIndex = 2;
+            this.ChangelogTextBox.Text = resources.GetString("ChangelogTextBox.Text");
+            this.ChangelogTextBox.WordWrap = false;
+            // 
+            // AboutReturnButton
+            // 
+            this.AboutReturnButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.AboutReturnButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.AboutReturnButton.Location = new System.Drawing.Point(172, 292);
+            this.AboutReturnButton.Margin = new System.Windows.Forms.Padding(0);
+            this.AboutReturnButton.Name = "AboutReturnButton";
+            this.AboutReturnButton.Size = new System.Drawing.Size(54, 24);
+            this.AboutReturnButton.TabIndex = 13;
+            this.AboutReturnButton.Text = "Return";
+            this.AboutReturnButton.UseVisualStyleBackColor = true;
+            this.AboutReturnButton.Click += new System.EventHandler(this.AboutReturnButton_Click);
             // 
             // MainWindow
             // 
@@ -1001,12 +1170,14 @@ namespace Unitversal
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(400, 350);
             this.ControlBox = false;
-            this.Controls.Add(this.SettingsPanel);
             this.Controls.Add(this.AboutDisplay);
+            this.Controls.Add(this.SettingsPanel);
+            this.Controls.Add(this.InfoDisplay);
             this.Controls.Add(this.SearchView);
             this.Controls.Add(this.SortButton);
-            this.Controls.Add(this.InterpretLabel);
             this.Controls.Add(this.SettingsButton);
+            this.Controls.Add(this.InterpretLabel);
+            this.Controls.Add(this.ClearSearchButton);
             this.Controls.Add(this.SearchBox);
             this.Controls.Add(this.TitleBar);
             this.DoubleBuffered = true;
@@ -1025,7 +1196,7 @@ namespace Unitversal
             this.TitleBar.PerformLayout();
             this.RightClickMenu.ResumeLayout(false);
             this.SortMenu.ResumeLayout(false);
-            this.AboutDisplay.ResumeLayout(false);
+            this.InfoDisplay.ResumeLayout(false);
             this.SettingsPanel.ResumeLayout(false);
             this.SettingsPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SignificantFiguresEntry)).EndInit();
@@ -1035,79 +1206,89 @@ namespace Unitversal
             ((System.ComponentModel.ISupportInitialize)(this.LargeExponentEntry)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.SmallMagnitudeEntry)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.SmallExponentEntry)).EndInit();
+            this.AboutDisplay.ResumeLayout(false);
+            this.AboutDisplay.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
-        }
-
-        #endregion
-
-        private System.Windows.Forms.Button CloseButton;
-        private System.Windows.Forms.Button MaximizeButton;
-        private System.Windows.Forms.Button MinimizeButton;
-        private System.Windows.Forms.Label Title;
-        private System.Windows.Forms.Panel TitleBar;
-        private System.Windows.Forms.TextBox SearchBox;
-        private System.Windows.Forms.ContextMenuStrip RightClickMenu;
-        private System.Windows.Forms.ToolStripMenuItem RightClickOpen;
-        private System.Windows.Forms.ToolStripMenuItem RightClickCut;
-        private System.Windows.Forms.ToolStripMenuItem RightClickCopy;
-        private System.Windows.Forms.ToolStripMenuItem RightClickPaste;
-        private System.Windows.Forms.ToolStripMenuItem RightClickSelectAll;
-        private System.Windows.Forms.Button SettingsButton;
-        private System.Windows.Forms.Label InterpretLabel;
-        private System.Windows.Forms.ToolTip InterpretToolTip;
-        private System.Windows.Forms.Button SortButton;
-        private System.Windows.Forms.ContextMenuStrip SortMenu;
-        private System.Windows.Forms.ToolStripMenuItem SortAscending;
-        private System.Windows.Forms.ToolStripMenuItem SortDescending;
-        private System.Windows.Forms.ToolStripSeparator SortSeparator;
-        private System.Windows.Forms.ToolStripMenuItem SortUnit;
-        private System.Windows.Forms.ToolStripMenuItem SortMagnitude;
-        private System.Windows.Forms.ListView SearchView;
-        private System.Windows.Forms.Panel AboutDisplay;
-        private System.Windows.Forms.RichTextBox DescriptionText;
-        private System.Windows.Forms.Button ReturnButton;
-        private System.Windows.Forms.Panel SettingsPanel;
-        private System.Windows.Forms.Label SettingsLabel;
-        private System.Windows.Forms.Label GeneralSettingsLabel;
-        private System.Windows.Forms.CheckBox PositionCheckbox;
-        private System.Windows.Forms.CheckBox SizeCheckbox;
-        private System.Windows.Forms.CheckBox CurrencyCheckbox;
-        private System.Windows.Forms.Label ConversionSettingsLabel;
-        private System.Windows.Forms.Label SignificantFiguresLabel;
-        private System.Windows.Forms.NumericUpDown SignificantFiguresEntry;
-        private System.Windows.Forms.Label DecimalSeparatorLabel;
-        private System.Windows.Forms.TextBox DecimalSeparatorEntry;
-        private System.Windows.Forms.Label IntegerGroupSeparatorLabel;
-        private System.Windows.Forms.TextBox IntegerGroupSeparatorEntry;
-        private System.Windows.Forms.Label IntegerGroupSizeLabel;
-        private System.Windows.Forms.NumericUpDown IntegerGroupSizeEntry;
-        private System.Windows.Forms.Label DecimalGroupSeparatorLabel;
-        private System.Windows.Forms.TextBox DecimalGroupSeparatorEntry;
-        private System.Windows.Forms.Label DecimalGroupSizeLabel;
-        private System.Windows.Forms.NumericUpDown DecimalGroupSizeEntry;
-        private System.Windows.Forms.Label ScientificNotationLabel;
-        private System.Windows.Forms.Label LargeMagnitudeLabel;
-        private System.Windows.Forms.NumericUpDown LargeMagnitudeEntry;
-        private System.Windows.Forms.Label LargeExponentLabel;
-        private System.Windows.Forms.NumericUpDown LargeExponentEntry;
-        private System.Windows.Forms.Label SmallMagnitudeLabel;
-        private System.Windows.Forms.NumericUpDown SmallMagnitudeEntry;
-        private System.Windows.Forms.Label SmallExponentLabel;
-        private System.Windows.Forms.NumericUpDown SmallExponentEntry;
-        private System.Windows.Forms.Label AppearLabel;
-        private System.Windows.Forms.RadioButton LightMode;
-        private System.Windows.Forms.RadioButton DarkMode;
-        private System.Windows.Forms.RadioButton SystemMode;
-        private System.Windows.Forms.Label HelpLabel;
-        private System.Windows.Forms.Button ExploreButton;
-        private System.Windows.Forms.Button UpdateCurrencyButton;
-        private System.Windows.Forms.Label CurrencyUpdateText;
-        private System.Windows.Forms.Label AboutLabel;
-        private System.Windows.Forms.Label AppNameLabel;
-        private System.Windows.Forms.Label AuthorLabel;
-        private System.Windows.Forms.Button SaveButton;
-        private System.Windows.Forms.Button CancButton;
     }
+
+    #endregion
+
+    private System.Windows.Forms.Button CloseButton;
+    private System.Windows.Forms.Button MaximizeButton;
+    private System.Windows.Forms.Button MinimizeButton;
+    private LabelNoCopy Title;
+    private System.Windows.Forms.Panel TitleBar;
+    private System.Windows.Forms.TextBox SearchBox;
+    private System.Windows.Forms.Button ClearSearchButton;
+    private System.Windows.Forms.ContextMenuStrip RightClickMenu;
+    private System.Windows.Forms.ToolStripMenuItem RightClickOpen;
+    private System.Windows.Forms.ToolStripMenuItem RightClickCut;
+    private System.Windows.Forms.ToolStripMenuItem RightClickCopy;
+    private System.Windows.Forms.ToolStripMenuItem RightClickPaste;
+    private System.Windows.Forms.ToolStripMenuItem RightClickSelectAll;
+    private LabelNoCopy InterpretLabel;
+    private System.Windows.Forms.ToolTip InterpretToolTip;
+    private System.Windows.Forms.Button SettingsButton;
+    private System.Windows.Forms.Button SortButton;
+    private System.Windows.Forms.ContextMenuStrip SortMenu;
+    private System.Windows.Forms.ToolStripMenuItem SortAscending;
+    private System.Windows.Forms.ToolStripMenuItem SortDescending;
+    private System.Windows.Forms.ToolStripSeparator SortSeparator;
+    private System.Windows.Forms.ToolStripMenuItem SortUnit;
+    private System.Windows.Forms.ToolStripMenuItem SortMagnitude;
+    private System.Windows.Forms.ListView SearchView;
+    private System.Windows.Forms.Panel InfoDisplay;
+    private System.Windows.Forms.RichTextBox DescriptionText;
+    private System.Windows.Forms.Button InfoReturnButton;
+    private System.Windows.Forms.Panel SettingsPanel;
+    private LabelNoCopy SettingsLabel;
+    private LabelNoCopy GeneralSettingsLabel;
+    private System.Windows.Forms.CheckBox PositionCheckbox;
+    private System.Windows.Forms.CheckBox SizeCheckbox;
+    private System.Windows.Forms.CheckBox CurrencyCheckbox;
+    private LabelNoCopy ConversionSettingsLabel;
+    private LabelNoCopy SignificantFiguresLabel;
+    private System.Windows.Forms.NumericUpDown SignificantFiguresEntry;
+    private LabelNoCopy DecimalSeparatorLabel;
+    private System.Windows.Forms.TextBox DecimalSeparatorEntry;
+    private LabelNoCopy IntegerGroupSeparatorLabel;
+    private System.Windows.Forms.TextBox IntegerGroupSeparatorEntry;
+    private LabelNoCopy IntegerGroupSizeLabel;
+    private System.Windows.Forms.NumericUpDown IntegerGroupSizeEntry;
+    private LabelNoCopy DecimalGroupSeparatorLabel;
+    private System.Windows.Forms.TextBox DecimalGroupSeparatorEntry;
+    private LabelNoCopy DecimalGroupSizeLabel;
+    private System.Windows.Forms.NumericUpDown DecimalGroupSizeEntry;
+    private LabelNoCopy ScientificNotationLabel;
+    private LabelNoCopy LargeMagnitudeLabel;
+    private System.Windows.Forms.NumericUpDown LargeMagnitudeEntry;
+    private LabelNoCopy LargeExponentLabel;
+    private System.Windows.Forms.NumericUpDown LargeExponentEntry;
+    private LabelNoCopy SmallMagnitudeLabel;
+    private System.Windows.Forms.NumericUpDown SmallMagnitudeEntry;
+    private LabelNoCopy SmallExponentLabel;
+    private System.Windows.Forms.NumericUpDown SmallExponentEntry;
+    private LabelNoCopy AppearLabel;
+    private System.Windows.Forms.RadioButton LightMode;
+    private System.Windows.Forms.RadioButton DarkMode;
+    private System.Windows.Forms.RadioButton SystemMode;
+    private LabelNoCopy HelpLabel;
+    private System.Windows.Forms.Button ExploreButton;
+    private System.Windows.Forms.Button UpdateCurrencyButton;
+    private LabelNoCopy CurrencyUpdateText;
+    private LabelNoCopy AboutLabel;
+    private System.Windows.Forms.TextBox AppAuthorText;
+    private System.Windows.Forms.Button SaveButton;
+    private System.Windows.Forms.Button CancButton;
+    private System.Windows.Forms.Button AboutButton;
+    private System.Windows.Forms.Panel AboutDisplay;
+    private System.Windows.Forms.Button NoticeButton;
+    private System.Windows.Forms.TextBox NoticeTextBox;
+    private System.Windows.Forms.Button LicenseButton;
+    private System.Windows.Forms.TextBox LicenseTextBox;
+    private System.Windows.Forms.Button ChangelogButton;
+    private System.Windows.Forms.TextBox ChangelogTextBox;
+    private System.Windows.Forms.Button AboutReturnButton;
 }

@@ -2,6 +2,39 @@
                                     CHANGELOG                                   
 ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
 
+Version 1.1.0 | 2023-01-18
+
+Bug Fixes
+> Fixed issue where the truncated interpretation text does not expand when
+  resizing the window.
+> Fixed issue for some units where commas do not properly appear for alternate
+  names in the info display.
+> Fixed issue with explore mode not exiting when the previous query is entered.
+> Fixed issue where commas in the magnitude of the query were not recognized.
+> Fixed issue with incorrect area conversions.
+> Fixed issue where the interpretation text appears when resizing window despite
+  results being cleared.
+> Fixed issue where double clicking labels undesirably copys its text to
+  clipboard.
+> Fixed currency update loop.
+
+New Features
+> Database revised.
+> New units added.
+> New "SI Equivalents" table in database.
+> New "Special Units" table in database.
+> New "Currency Alias" table in database.
+> Clicking title bar now unselects items in search results.
+> Conversion results are now rounded to the specified number of significant
+  digits.
+> Double clicking interpretation text with info display open will now update the
+  display if the units are different.
+> Clicking links in the info display now opens in the default browser.
+> Added about page in settings.
+> A clear button now appears in the search box when text is entered.
+
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
+
 Version 1.0.0 | 2022-10-18
 
-First release.
+> First release.

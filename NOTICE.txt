@@ -6,7 +6,7 @@ Unitversal contains the following software dependencies:
 
 ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
 
-.NET Core 6.0
+.NET Core 7.0
 
 The MIT License (MIT)
 
@@ -62,7 +62,7 @@ SOFTWARE.
 
 ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
 
-Microsoft.EntityFrameworkCore.Sqlite 6.0.10
+Microsoft.EntityFrameworkCore.Sqlite 7.0.2
 
 The MIT License (MIT)
 
