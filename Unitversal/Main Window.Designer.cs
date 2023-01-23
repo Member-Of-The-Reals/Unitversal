@@ -413,6 +413,7 @@ partial class MainWindow
             this.SearchView.Size = new System.Drawing.Size(360, 232);
             this.SearchView.TabIndex = 9;
             this.SearchView.UseCompatibleStateImageBehavior = false;
+            this.SearchView.View = System.Windows.Forms.View.Details;
             this.SearchView.ColumnWidthChanged += new System.Windows.Forms.ColumnWidthChangedEventHandler(this.SearchView_ColumnWidthChanged);
             this.SearchView.ItemActivate += new System.EventHandler(this.SearchView_ItemActivate);
             this.SearchView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SearchView_KeyDown);

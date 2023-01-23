@@ -2,6 +2,20 @@
                                     CHANGELOG                                   
 ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
 
+Version 1.1.1 | 2023-01-22
+
+Bug Fixes
+> Fixed issue where database is not found when launched from a different path.
+> Fixed issue that disabled info mode.
+> Fixed issue where sort order can reset when converting to all units.
+> Fixed issue where sorting results in explore mode can cause results to
+  disappear.
+> Fixed incorrect descending sort order in explore mode.
+> Fixed issue where maximizing window in explore mode reverts interpretation
+  text to previous query.
+
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
+
 Version 1.1.0 | 2023-01-18
 
 Bug Fixes

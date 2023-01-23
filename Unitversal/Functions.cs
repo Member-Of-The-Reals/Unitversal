@@ -293,23 +293,24 @@ public partial class MainWindow : Form
     /// </returns>
     private string TruncateInterpretation(string Interpretation)
     {
+        string TruncatedText = Interpretation;
         int StringWidth = TextRenderer.MeasureText(Interpretation, InterpretLabel.Font).Width;
         int Overflow = SortButton.Location.X - InterpretLabel.Location.X;
         //Truncate text if overflow
         if (StringWidth > Overflow)
         {
-            Interpretation += "...";
+            TruncatedText += "...";
             while (StringWidth > Overflow)
             {
-                Interpretation = Interpretation.Remove(Interpretation.Length - 4, 1);
-                StringWidth = TextRenderer.MeasureText(Interpretation, InterpretLabel.Font).Width;
+                TruncatedText = TruncatedText.Remove(TruncatedText.Length - 4, 1);
+                StringWidth = TextRenderer.MeasureText(TruncatedText, InterpretLabel.Font).Width;
             }
-            return Interpretation;
+            return TruncatedText;
         }
         //Restore truncated text if no longer overflowing
         else
         {
-            return AppState.Interpretation;
+            return Interpretation;
         }
     }
     /// <summary>
@@ -376,6 +377,12 @@ public partial class MainWindow : Form
         ClearSearchView();
         UpdateInterpretation();
         Calculate.Conversions();
+        //Sort if converting to all. For convert to and info mode, best match sort order is used.
+        if (Calculate.QueryType == "ALL")
+        {
+            Calculate.SortResults(Settings.SortBy, Settings.SortOrder);
+        }
+        //BeginUpdate and EndUpdate must be called an equal number of times.
         SearchView.BeginUpdate();
         foreach (string x in Calculate.Results)
         {
@@ -388,23 +395,18 @@ public partial class MainWindow : Form
     /// <summary>
     /// Sort the results in <see cref="MainWindow.SearchView"/>.
     /// </summary>
-    private void SortResults(string SortBy, string SortOrder)
+    private void SortResults()
     {
+        //BeginUpdate and EndUpdate must be called an equal number of times.
         SearchView.BeginUpdate();
         if (AppState.Explore == true)
         {
             if (Settings.SortOrder == PreviousState.SortOrder)
             {
+                SearchView.EndUpdate();
                 return;
             }
-            if (Settings.SortOrder == "ASCENDING")
-            {
-                Database.UnitListNoPlural.Sort();
-            }
-            else
-            {
-                Database.UnitListNoPlural.Reverse();
-            }
+            Database.SortUnitListNoPlural(Settings.SortOrder);
             SearchView.Items.Clear();
             foreach (string x in Database.UnitListNoPlural)
             {
@@ -413,7 +415,7 @@ public partial class MainWindow : Form
         }
         else
         {
-            Calculate.SortResults(SortBy, SortOrder);
+            Calculate.SortResults(Settings.SortBy, Settings.SortOrder);
             SearchView.Items.Clear();
             foreach (string x in Calculate.Results)
             {

@@ -58,9 +58,13 @@ public static class Database
     /// </summary>
     public static HashSet<string> UnitListPlural = new HashSet<string>();
     /// <summary>
-    /// <see langword="List"/> of all unit names excluding plurals.
+    /// <see langword="List"/> of all unit names excluding plurals. Presorted in ascending order.
     /// </summary>
     public static List<string> UnitListNoPlural = new List<string>();
+    /// <summary>
+    /// <see langword="string"/> of the sort order of <see cref="Database.UnitListNoPlural"/>.
+    /// </summary>
+    private static string UnitListNoPluralSortOrder = "ASCENDING";
     /// <summary>
     /// Unit information stored as an <see cref="Entry"/> inside a <see langword="Dictionary"/> and organized by unit type inside the main <see langword="Dictionary"/>.
     /// </summary>
@@ -290,6 +294,18 @@ public static class Database
         { "Zambia", "Zambian Kwacha" },
         { "Zimbabwe", "Real Time Gross Settlement Dollar" }
     };
+    /// <summary>
+    /// Sort the <see cref="Database.UnitListNoPlural"/> list ascending or descending.
+    /// </summary>
+    public static void SortUnitListNoPlural(string SortOrder)
+    {
+        if (SortOrder != UnitListNoPluralSortOrder)
+        {
+            //Reverse() is used because it is O(n).
+            Database.UnitListNoPlural.Reverse();
+            UnitListNoPluralSortOrder = SortOrder;
+        }
+    }
     /// <summary>
     /// Gets info about a unit as an <see cref="Entry"/> from cache. Faster than database file.
     /// </summary>
@@ -571,6 +587,7 @@ public static class Database
                 }
             }
         }
+        UnitListNoPlural.Sort();
     }
     /// <summary>
     /// Check for internet connection.
@@ -809,11 +826,11 @@ public static class Search
 {
     readonly static char[] Digits = "0123456789".ToCharArray();
     /// <summary>
-    /// Get first non digit index of a given string. This does not include scientific notation,
+    /// Get first non-digit index of a given string. This does not include scientific notation,
     /// separator symbols or "-" signs.
     /// </summary>
     /// <returns>
-    /// An <see cref="int"/> of the first non digit index or -1 if there is none.
+    /// An <see cref="int"/> of the first non-digit index or -1 if there is none.
     /// </returns>
     public static int FirstNonDigitIndex(string Text, char[] SeparatorSymbols)
     {
@@ -1360,10 +1377,7 @@ public static class Calculate
         //Info mode
         if (QueryType == "INFO")
         {
-            for (int i = 0; i < Results.Count; i++)
-            {
-                Results.Add(Unit1BestMatches[i]);
-            }
+            Results = new List<string>(Unit1BestMatches);
         }
         //Convert mode
         else if (QueryType == "CONVERT")

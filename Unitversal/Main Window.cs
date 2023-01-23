@@ -11,18 +11,16 @@ public partial class MainWindow : Form
         InitializeComponent();
         //Redraw when resized to avoid visual artifacts
         SetStyle(ControlStyles.ResizeRedraw, true);
-        //Show each item on a separate line
-        SearchView.View = View.Details;
         //Add autosizing column to search view width
         SearchView.Columns.Add("Result", -1, HorizontalAlignment.Center);
         //Change renderer for right click and sort menu
         RightClickMenu.Renderer = new ContextMenuRenderer();
         SortMenu.Renderer = new ContextMenuRenderer();
+        AppAuthorText.Text = $"{Application.ProductName} {Application.ProductVersion}\r\n© 2023 Member Of The Reals";
     }
     //Before main windows shows
     private void MainWindow_Load(object sender, EventArgs e)
     {
-        AppAuthorText.Text = $"{Application.ProductName} {Application.ProductVersion}\r\n© 2022 Member Of The Reals";
         //Check and create settings file
         if (File.Exists(AppState.SettingsFile.Path))
         {
@@ -207,7 +205,10 @@ public partial class MainWindow : Form
             InterpretLabel.Text = TruncateInterpretation(AppState.Interpretation);
         }
         //Resize column width to fit longest item
-        SearchView.Columns[0].Width = -1;
+        if (SearchView.Columns.Count > 0)
+        {
+            SearchView.Columns[0].Width = -1;
+        }
         ScrollTextContents(true);
         Settings.WindowSize = Size;
     }
@@ -652,7 +653,7 @@ public partial class MainWindow : Form
         //Sort results
         if (SearchView.Items.Count > 0 && Settings.SortOrder != PreviousState.SortOrder)
         {
-            SortResults(Settings.SortBy, Settings.SortOrder);
+            SortResults();
         }
         //Renew previous state
         PreviousState.SortOrder = Settings.SortOrder;
@@ -675,7 +676,7 @@ public partial class MainWindow : Form
         //Sort results
         if (SearchView.Items.Count > 0 && Settings.SortOrder != PreviousState.SortOrder)
         {
-            SortResults(Settings.SortBy, Settings.SortOrder);
+            SortResults();
         }
         //Renew previous state
         PreviousState.SortOrder = Settings.SortOrder;
@@ -698,7 +699,7 @@ public partial class MainWindow : Form
         //Sort results
         if (SearchView.Items.Count > 0 && Settings.SortBy != PreviousState.SortBy)
         {
-            SortResults(Settings.SortBy, Settings.SortOrder);
+            SortResults();
         }
         //Renew previous state
         PreviousState.SortBy = Settings.SortBy;
@@ -721,7 +722,7 @@ public partial class MainWindow : Form
         //Sort results
         if (SearchView.Items.Count > 0 && Settings.SortBy != PreviousState.SortBy)
         {
-            SortResults(Settings.SortBy, Settings.SortOrder);
+            SortResults();
         }
         //Renew previous state
         PreviousState.SortBy = Settings.SortBy;
@@ -1034,15 +1035,10 @@ public partial class MainWindow : Form
             {
                 AppState.Explore = true;
                 SearchView.Items.Clear(); //Clear search view
-                InterpretLabel.Text = "Interpretation: Explore All Units";
-                if (Settings.SortOrder == "ASCENDING")
-                {
-                    Database.UnitListNoPlural.Sort();
-                }
-                else
-                {
-                    Database.UnitListNoPlural.Reverse();
-                }
+                AppState.Interpretation = "Interpretation: Explore All Units";
+                InterpretLabel.Text = TruncateInterpretation(AppState.Interpretation);
+                Database.SortUnitListNoPlural(Settings.SortOrder);
+                //BeginUpdate and EndUpdate must be called an equal number of times.
                 SearchView.BeginUpdate();
                 foreach (string x in Database.UnitListNoPlural)
                 {

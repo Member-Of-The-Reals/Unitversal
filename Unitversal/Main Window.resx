@@ -838,6 +838,20 @@ Public License instead of this License.  But first, please read
                                     CHANGELOG                                   
 ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
 
+Version 1.1.1 | 2023-01-22
+
+Bug Fixes
+&gt; Fixed issue where database is not found when launched from a different path.
+&gt; Fixed issue that disabled info mode.
+&gt; Fixed issue where sort order can reset when converting to all units.
+&gt; Fixed issue where sorting results in explore mode can cause results to
+  disappear.
+&gt; Fixed incorrect descending sort order in explore mode.
+&gt; Fixed issue where maximizing window in explore mode reverts interpretation
+  text to previous query.
+
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
+
 Version 1.1.0 | 2023-01-18
 
 Bug Fixes
@@ -850,7 +864,7 @@ Bug Fixes
 &gt; Fixed issue with incorrect area conversions.
 &gt; Fixed issue where the interpretation text appears when resizing window despite
   results being cleared.
-&gt; Fixed issue where double clicking labels undesirably copys its text to
+&gt; Fixed issue where double clicking labels undesirably copies its text to
   clipboard.
 &gt; Fixed currency update loop.
 

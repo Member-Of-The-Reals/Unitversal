@@ -6,13 +6,17 @@
 public static class AppState
 {
     /// <summary>
+    /// Location of the app as an absolute path.
+    /// </summary>
+    readonly static string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+    /// <summary>
     /// Connection to the setting file using the Windows ini API.
     /// </summary>
-    public static IniFile SettingsFile = new IniFile("Unitversal");
+    public static IniFile SettingsFile = new IniFile(CurrentDirectory + "Unitversal");
     /// <summary>
     /// Path to the database file.
     /// </summary>
-    public static string DatabasePath = "db.db";
+    public static string DatabasePath = CurrentDirectory + "db.db";
     /// <summary>
     /// Enable or disable the window from resize by dragging the edges or corners.
     /// </summary>
