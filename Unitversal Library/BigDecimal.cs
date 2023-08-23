@@ -157,9 +157,10 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
     /// <summary>
     /// Tries to convert the string representation of a number to its <see cref="BigDecimal"/>
     /// equivalent, and returns a value that indicates whether the conversion succeeded.
+    /// Also recognizes scientific notation.
     /// </summary>
     /// <returns>
-    /// <see langword="true"/> if the <paramref name="value"/> was converted succcessfully; otherwise, <see langword="false"/>.
+    /// <see langword="true"/> if the <paramref name="value"/> was converted successfully; otherwise, <see langword="false"/>.
     /// </returns>
     /// <exception cref="System.ArgumentNullException">
     /// Thrown when the value is null.
@@ -169,7 +170,7 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
         result = 0;
         BigInteger mantissa;
         int exponent = 0;
-        string numberString = value;
+        string numberString = value.ToUpper();
         int separatorIndex = numberString.IndexOf(separator);
         //Check for duplicate decimals
         for (int i = separatorIndex; i > -1; i = numberString.IndexOf(separator, i + 1))
@@ -179,11 +180,21 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
                 return false;
             }
         }
+        //Scientific notation
+        if (numberString.Contains("E"))
+        {
+            string[] tokenizedNumber = numberString.Split("E");
+            numberString = tokenizedNumber[0];
+            if (!int.TryParse(tokenizedNumber[1], out exponent))
+            {
+                return false;
+            }
+        }
         //If real number
         if (separatorIndex > -1)
         {
-            numberString = numberString.Replace(separator.ToString(), string.Empty);
-            exponent = separatorIndex - numberString.Length;
+            numberString = numberString.Replace(separator.ToString(), "");
+            exponent += separatorIndex - numberString.Length;
         }
         if (BigInteger.TryParse(numberString, out mantissa))
         {
@@ -453,6 +464,10 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
     /// </summary>
     public string ToFormattedString(BigDecimal SmallMagnitude, BigDecimal LargeMagnitude)
     {
+        if (this.Mantissa.IsZero)
+        {
+            return "0";
+        }
         BigDecimal Number = this;
         bool Negative = false;
         bool ScientificNotation = false;
@@ -528,7 +543,7 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
         return NumberString;
     }
     /// <summary>
-    /// Convert a formatted <see cref="BigDecimal"/> string to a <see cref="BigDecimal"/>.
+    /// Convert a <see cref="BigDecimal"/> string formatted with <see cref="ToFormattedString"/> to a <see cref="BigDecimal"/>.
     /// </summary>
     public static BigDecimal ReverseFormat(string Number, string DecimalSeparator, string IntegerGroupSeparator, string DecimalGroupSeparator)
     {
@@ -563,7 +578,7 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
     /// <summary>
     /// Convert a <see cref="BigDecimal"/> to a plain decimal string.
     /// </summary>
-    public static string PlainString(BigDecimal Number)
+    public static string PlainString(BigDecimal Number, string DecimalSeparator)
     {
         string NumberString = Number.Mantissa.ToString();
         if (Number.Exponent < 0)
@@ -572,11 +587,11 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
             if (Exponent <= 0)
             {
                 Exponent = Exponent * -1;
-                NumberString = $"0." + NumberString.PadLeft(NumberString.Length + Exponent, '0');
+                NumberString = $"0{DecimalSeparator}" + NumberString.PadLeft(NumberString.Length + Exponent, '0');
             }
             else
             {
-                NumberString = NumberString.Insert(Exponent, ".");
+                NumberString = NumberString.Insert(Exponent, DecimalSeparator);
             }
         }
         else if (Number.Exponent >= 0)
@@ -587,7 +602,7 @@ public struct BigDecimal : IComparable, IComparable<BigDecimal>
     }
     public string PlainString()
     {
-        return PlainString(this);
+        return PlainString(this, DecimalSeparator);
     }
 
     public override string ToString()

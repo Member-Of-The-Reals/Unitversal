@@ -22,11 +22,7 @@ public static class AppState
     /// </summary>
     public static bool Resize = true;
     /// <summary>
-    /// Get information about unit from interpretation text instead of <see cref="MainWindow"/>.SearchView.
-    /// </summary>
-    public static bool InterpretInfo = false;
-    /// <summary>
-    /// Text of the interpretation of the user <see cref="MainWindow"/>.SearchBox query.
+    /// <see cref="string"/> of the interpretation of the user query in <see cref="MainWindow.SearchBox"/>.
     /// </summary>
     public static string Interpretation;
     /// <summary>
@@ -42,7 +38,7 @@ public static class AppState
     /// </summary>
     public static bool SortShown = false;
     /// <summary>
-    /// Tracks whether the text in <see cref="MainWindow"/>.SearchBox is greater than its width.
+    /// Tracks whether the text in <see cref="MainWindow.SearchBox"/> is greater than its width.
     /// </summary>
     public static bool EntryMaxed = false;
     /// <summary>
@@ -66,13 +62,29 @@ public static class AppState
     /// </summary>
     public static Color MenuHighlight;
     /// <summary>
-    /// Pen color according to <see cref="AppState"/>.Theme.
+    /// Pen color according to <see cref="AppState.Theme"/>.
     /// </summary>
     public static Pen SystemColorPen;
     /// <summary>
-    /// Tracks whether the user is currently exploring all units.
+    /// Tracks whether the user is exploring units.
     /// </summary>
     public static bool Explore = false;
+    /// <summary>
+    /// Tracks whether the sort menu is shown.
+    /// </summary>
+    public static bool ExploreSortShown = false;
+    /// <summary>
+    /// Tracks whether <see cref="MainWindow.CategoryView"/> is on a second menu.
+    /// </summary>
+    public static string SecondMenu = "";
+    /// <summary>
+    /// Tracks the first unit selected <see cref="MainWindow.TemperatureView"/>.
+    /// </summary>
+    public static string FirstUnit = "";
+    /// <summary>
+    /// Tracks the current view in explorer.
+    /// </summary>
+    public static string CurrentView = "";
 }
 /// <summary>
 /// Partially stores a previous state of the app.
@@ -80,7 +92,6 @@ public static class AppState
 public static class PreviousState
 {
     //Search box
-    public static string Query;
     public static BigDecimal Magnitude;
     public static string QueryType;
     public static List<string> Unit1BestMatches = new List<string>();
@@ -88,9 +99,9 @@ public static class PreviousState
     //Sort menu
     public static string SortOrder;
     public static string SortBy;
-    //About display
-    public static string SelectedUnit;
-    public static string DecimalSeparator;
+    //Explorer
+    public static string SecondMenu;
+    public static string FirstUnit;
 }
 /// <summary>
 /// Stores the settings of the app which will be stored in a file.

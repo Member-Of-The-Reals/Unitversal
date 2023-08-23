@@ -2,6 +2,27 @@
                                     CHANGELOG                                   
 ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
 
+Version 1.2.0 | 2023-08-22
+
+Bug Fixes
+> Sorting by magnitude for info mode causing error.
+> Clear search button blocking text.
+> Results showing 0E0 now shows 0.
+> Sorting negative magnitudes causing error.
+> Division by 0 for some unit conversions.
+
+Improvements
+> Database revised.
+> Faster startup.
+> Better performance.
+> Better search results.
+
+New Features
+> New units added.
+> New explorer mode.
+
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
+
 Version 1.1.1 | 2023-01-22
 
 Bug Fixes

@@ -1,9 +1,9 @@
 ﻿namespace UnitversalLibrary;
 
 /// <summary>
-/// Stores information from the unit's database entry.
+/// Stores information about a unit's database entry.
 /// </summary>
-public class Entry
+public class UnitEntry
 {
     public string Unit;
     public string Type;
@@ -12,8 +12,27 @@ public class Entry
     public List<string> AlternateNames = new List<string>();
     public List<string> Symbols = new List<string>();
     public List<string> Abbreviations = new List<string>();
-    public List<string> AmericanSpelling = new List<string>();
     public List<string> Plurals = new List<string>();
+    public List<string> Variants = new List<string>();
+}
+/// <summary>
+/// Stores information about a prefix's database entry.
+/// </summary>
+public class PrefixEntry
+{
+    public PrefixEntry(string Prefix, string Symbol, string Factor, string StandardForm, string Description)
+    {
+        this.Prefix = Prefix;
+        this.Symbol = Symbol;
+        this.Factor = Factor;
+        this.StandardForm = StandardForm;
+        this.Description = Description;
+    }
+    public string Prefix;
+    public string Symbol;
+    public string Factor;
+    public string StandardForm;
+    public string Description;
 }
 /// <summary>
 /// Currency API data root.
@@ -50,6 +69,42 @@ public class Datum
 public static class Database
 {
     /// <summary>
+    /// If the "Alternate Names" table exists in database.
+    /// </summary>
+    private static bool AlternateExist = false;
+    /// <summary>
+    /// If the "Binary Prefixes" table exists in database.
+    /// </summary>
+    private static bool BinaryPrefixExist = false;
+    /// <summary>
+    /// If the "Case Sensitive" table exists in database.
+    /// </summary>
+    private static bool CaseExist = false;
+    /// <summary>
+    /// If the "Currency Alias" table exists in database.
+    /// </summary>
+    private static bool CurrencyExist = false;
+    /// <summary>
+    /// If the "Info" table exists in database.
+    /// </summary>
+    private static bool InfoExist = false;
+    /// <summary>
+    /// If the "SI Equivalents" table exists in database.
+    /// </summary>
+    private static bool SIExists = false;
+    /// <summary>
+    /// If the "SI Prefixes" table exists in database.
+    /// </summary>
+    private static bool SIPrefixExists = false;
+    /// <summary>
+    /// If the "Special Units" table exists in database.
+    /// </summary>
+    private static bool SpecialExist = false;
+    /// <summary>
+    /// If the "Temperature Formulas" table exists in database.
+    /// </summary>
+    private static bool TemperatureExists = false;
+    /// <summary>
     /// <see langword="Dictionary"/> of all unit names and alternate names as keys linked to their primary unit names as values.
     /// </summary>
     public static Dictionary<string, string> UnitList = new Dictionary<string, string>();
@@ -62,13 +117,21 @@ public static class Database
     /// </summary>
     public static List<string> UnitListNoPlural = new List<string>();
     /// <summary>
-    /// <see langword="string"/> of the sort order of <see cref="Database.UnitListNoPlural"/>.
+    /// Unit information stored in a nested <see langword="Dictionary"/> in the format (Type, (Unit, <see cref="UnitEntry"/>)).
     /// </summary>
-    private static string UnitListNoPluralSortOrder = "ASCENDING";
+    public static Dictionary<string, Dictionary<string, UnitEntry>> UnitCache = new Dictionary<string, Dictionary<string, UnitEntry>>();
     /// <summary>
-    /// Unit information stored as an <see cref="Entry"/> inside a <see langword="Dictionary"/> and organized by unit type inside the main <see langword="Dictionary"/>.
+    /// <see langword="List"/> of categories of units in <see cref="Database.UnitCache"/>. Presorted in ascending order.
     /// </summary>
-    public static Dictionary<string, Dictionary<string, Entry>> UnitCache = new Dictionary<string, Dictionary<string, Entry>>();
+    public static List<string> UnitCategories = new List<string>();
+    /// <summary>
+    /// <see langword="HashSet"/> of case sensitive unit names. Stored in uppercase.
+    /// </summary>
+    public static HashSet<string> CasingList = new HashSet<string>();
+    /// <summary>
+    /// Temporary <see langword="List"/> of items to display in explore mode.
+    /// </summary>
+    public static List<string> ExploringItems;
     /// <summary>
     /// <see langword="Dictionary"/> of all inexact SI equivalent values of units as a string.
     /// </summary>
@@ -76,42 +139,29 @@ public static class Database
     /// <summary>
     /// <see langword="HashSet"/> of special units that require specific equations for conversion.
     /// </summary>
-    public static readonly HashSet<string> SpecialUnits = new HashSet<string>
-    {
-        { "Celsius" },
-        { "Day Per Foot" },
-        { "Day Per Kilometre" },
-        { "Day Per Metre" },
-        { "Day Per Mile" },
-        { "Delisle" },
-        { "Fahrenheit" },
-        { "Hour Per Foot" },
-        { "Hour Per Kilometre" },
-        { "Hour Per Metre" },
-        { "Hour Per Mile" },
-        { "Kelvin" },
-        { "Litre Per 100 Kilometre" },
-        { "Litre Per Kilometre" },
-        { "Litre Per Metre" },
-        { "Minute Per Foot" },
-        { "Minute Per Kilometre" },
-        { "Minute Per Metre" },
-        { "Minute Per Mile" },
-        { "Newton (Temperature)" },
-        { "Rankine" },
-        { "Réaumur" },
-        { "Rømer" },
-        { "Second Per Foot" },
-        { "Second Per Kilometre" },
-        { "Second Per Metre" },
-        { "Second Per Mile" },
-        { "US Gallon Per Mile" }
-    };
+    public static HashSet<string> SpecialUnits = new HashSet<string>();
+    /// <summary>
+    /// <see langword="Dictionary"/> where the key is a unit type and the value is the SI equivalent unit name used for that type.
+    /// </summary>
+    public static Dictionary<string, string> SIEquivalents = new Dictionary<string, string>();
+    /// <summary>
+    /// <see langword="Dictionary"/> of SI prefixes where the key is prefix name and value is prefix information stored as a <see cref="PrefixEntry"/>.
+    /// </summary>
+    public static Dictionary<string, PrefixEntry> SIPrefixes = new Dictionary<string, PrefixEntry>();
+    /// <summary>
+    /// <see langword="Dictionary"/> of binary prefixes where the key is prefix name and value is prefix information stored as a <see cref="PrefixEntry"/>.
+    /// </summary>
+    public static Dictionary<string, PrefixEntry> BinaryPrefixes = new Dictionary<string, PrefixEntry>();
+    /// <summary>
+    /// <see langword="Dictionary"/> that stores the formulas for converting between different
+    /// temperature scales in the format (Unit1, (Unit2, (Formula, Description))).
+    /// </summary>
+    public static Dictionary<string, Dictionary<string, Tuple<string, string>>> TemperatureFormulas = new Dictionary<string, Dictionary<string, Tuple<string, string>>>();
     /// <summary>
     /// Currency API from https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange
     /// Formatted with <see cref="Database.APIYear"/> and <see cref="Database.APIQuarter"/>.
     /// </summary>
-    public static string CurrencyAPI { 
+    public static string CurrencyAPI {
         get => $"https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?fields=effective_date,country,currency,exchange_rate&filter=record_calendar_year:eq:{Database.APIYear},record_calendar_quarter:eq:{Database.APIQuarter},page[size]=200&sort=country";
     }
     /// <summary>
@@ -123,208 +173,50 @@ public static class Database
     /// </summary>
     public static int APIQuarter;
     /// <summary>
-    /// <see langword="Dictionary"/> of names from the currency API linked to its corresponding database names.
+    /// <see langword="Dictionary"/> of countries from the currency API linked to its corresponding
+    /// currency from database.
     /// </summary>
-    public static readonly Dictionary<string, string> CurrencyAlias = new Dictionary<string, string>
+    public static Dictionary<string, string> CurrencyAlias = new Dictionary<string, string>();
+    /// <summary>
+    /// <see langword="string"/> of the sort orders for string lists.
+    /// </summary>
+    private static Dictionary<Int32, string> SortOrders = new Dictionary<Int32, string>
     {
-        { "Afghanistan", "Afghan Afghani" },
-        { "Albania", "Albanian Lek" },
-        { "Algeria", "Algerian Dinar" },
-        { "Angola", "Angolan Kwanza" },
-        { "Antigua & Barbuda", "Eastern Caribbean Dollar" },
-        { "Argentina", "Argentina Peso" },
-        { "Armenia", "Armenian Dram" },
-        { "Australia", "Australian Dollar" },
-        { "Azerbaijan", "Azerbaijani Manat" },
-        { "Bahamas", "Bahamian Dollar" },
-        { "Bahrain", "Bahraini Dinar" },
-        { "Bangladesh", "Bangladeshi Taka" },
-        { "Barbados", "Barbadian Dollar" },
-        { "Belaruse", "Belarusian Ruble" },
-        { "Belize", "Belize Dollar" },
-        { "Benin", "West African CFA Franc" },
-        { "Bermuda", "Bermudian Dollar" },
-        { "Bolivia", "Bolivian Boliviano" },
-        { "Bosnia", "Bosnia and Herzegovina Convertible Mark" },
-        { "Botswana", "Botswana Pula" },
-        { "Brazil", "Brazil Real" },
-        { "Brunei", "Brunei Dollar" },
-        { "Bulgaria", "Bulgarian Lev" },
-        { "Burkina Faso", "West African CFA Franc" },
-        { "Burma", "Myanmar Kyat" },
-        { "Burundi", "Burundian Franc" },
-        { "Cambodia", "Cambodian Riel" },
-        { "Cameroon", "Central African CFA Franc" },
-        { "Canada", "Canadian Dollar" },
-        { "Cape Verde", "Cape Verdean Escudo" },
-        { "Cayman Island", "Cayman Islands Dollar" },
-        { "Central African Rep.", "Central African CFA Franc" },
-        { "Chad", "Central African CFA Franc" },
-        { "Chile", "Chilean Peso" },
-        { "China", "Renminbi" },
-        { "Colombia", "Colombian Peso" },
-        { "Comoros", "Comorian Franc" },
-        { "Congo", "Central African CFA Franc" },
-        { "Costa Rica", "Costa Rican Colón" },
-        { "Cote D'ivoire", "West African CFA Franc" },
-        { "Croatia", "Croatian Kuna" },
-        { "Cuba", "Cuban Peso" },
-        { "Czech. Republic", "Czech Koruna" },
-        { "Dem. Rep. of Congo", "Congolese Franc" },
-        { "Denmark", "Danish Krone" },
-        { "Djibouti", "Djiboutian Franc" },
-        { "Dominican Republic", "Dominican Peso" },
-        { "Ecuador", "United States Dollar" },
-        { "Egypt", "Egyptian Pound" },
-        { "El Salvador", "United States Dollar" },
-        { "Equatorial Guinea", "Central African CFA Franc" },
-        { "Eritrea", "Eritrean Nakfa" },
-        { "Ethiopia", "Ethiopian Birr" },
-        { "Euro Zone", "Euro" },
-        { "Fiji", "Fijian Dollar" },
-        { "Gabon", "Central African CFA Franc" },
-        { "Gambia", "Gambian Dalasi" },
-        { "Georgia", "Georgian Lari" },
-        { "Ghana", "Ghanaian Cedi" },
-        { "Grenada", "Eastern Caribbean Dollar" },
-        { "Guatemala", "Guatemalan Quetzal" },
-        { "Guinea", "Guinean Franc" },
-        { "Guinea Bissau", "West African CFA Franc" },
-        { "Guyana", "Guyanese Dollar" },
-        { "Haiti", "Haitian Gourde" },
-        { "Honduras", "Honduran Lempira" },
-        { "Hong Kong", "Hong Kong Dollar" },
-        { "Hungary", "Hungarian Forint" },
-        { "Iceland", "Icelandic Króna" },
-        { "India", "Indian Rupee" },
-        { "Indonesia", "Indonesian Rupiah" },
-        { "Iran", "Iranian Rial" },
-        { "Iraq", "Iraqi Dinar" },
-        { "Israel", "Israeli New Shekel" },
-        { "Jamaica", "Jamaican Dollar" },
-        { "Japan", "Japanese Yen" },
-        { "Jordan", "Jordanian Dinar" },
-        { "Kazakhstan", "Kazakhstani Tenge" },
-        { "Kenya", "Kenyan Shilling" },
-        { "Korea", "South Korean Won" },
-        { "Kuwait", "Kuwaiti Dinar" },
-        { "Kyrgyzstan", "Kyrgyzstani Som" },
-        { "Laos", "Lao Kip" },
-        { "Lebanon", "Lebanese Pound" },
-        { "Lesotho", "Lesotho Loti" },
-        { "Liberia", "Liberian Dollar" },
-        { "Libya", "Libyan Dinar" },
-        { "Madagascar", "Malagasy Ariary" },
-        { "Malawi", "Malawian Kwacha" },
-        { "Malaysia", "Malaysian Ringgit" },
-        { "Maldives", "Maldivian Rufiyaa" },
-        { "Mali", "West African CFA Franc" },
-        { "Marshall Islands", "United States Dollar" },
-        { "Mauritania", "Mauritanian Ouguiya" },
-        { "Mauritius", "Mauritian Rupee" },
-        { "Mexico", "Mexican Peso" },
-        { "Micronesia", "United States Dollar" },
-        { "Moldova", "Moldovan Leu" },
-        { "Mongolia", "Mongolian Tögrög" },
-        { "Morocco", "Moroccan Dirham" },
-        { "Mozambique", "Mozambican Metical" },
-        { "Nambia", "Namibian Dollar" },
-        { "Nepal", "Nepalese Rupee" },
-        { "Netherlands Antilles", "Netherlands Antillean Guilder" },
-        { "New Zealand", "New Zealand Dollar" },
-        { "Nicaragua", "Nicaraguan Córdoba" },
-        { "Niger", "West African CFA Franc" },
-        { "Nigeria", "Nigerian Naira" },
-        { "Norway", "Norwegian Krone" },
-        { "Oman", "Omani Rial" },
-        { "Pakistan", "Pakistani Rupee" },
-        { "Panama", "Panamanian Balboa" },
-        { "Papua New Guinea", "Papua New Guinean Kina" },
-        { "Paraguay", "Paraguayan Guaraní" },
-        { "Peru", "Peruvian Sol" },
-        { "Philippines", "Philippine Peso" },
-        { "Poland", "Polish Złoty" },
-        { "Qatar", "Qatari Riyal" },
-        { "Rep. of N Macedonia", "North Macedonian Denar" },
-        { "Republic of Palau", "United States Dollar" },
-        { "Romania", "Romanian Leu" },
-        { "Russia", "Russian Ruble" },
-        { "Rwanda", "Rwandan Franc" },
-        { "Sao Tome & Principe", "São Tomé and Príncipe Dobra" },
-        { "Saudi Arabia", "Saudi Riyal" },
-        { "Senegal", "West African CFA Franc" },
-        { "Serbia", "Serbian Dinar" },
-        { "Seychelles", "Seychellois Rupee" },
-        { "Sierra Leone", "Sierra Leonean Leone" },
-        { "Singapore", "Singapore Dollar" },
-        { "Solomon Islands", "Solomon Islands Dollar" },
-        { "Somali", "Somali Shilling" },
-        { "South Sudan", "South Sudanese Pound" },
-        { "South Africa", "South African Rand" },
-        { "Sri Lanka", "Sri Lankan Rupee" },
-        { "St. Lucia", "Eastern Caribbean Dollar" },
-        { "Sudan", "Sudanese Pound" },
-        { "Suriname", "Surinamese Dollar" },
-        { "Swaziland", "Swazi Lilangeni" },
-        { "Sweden", "Swedish Krona" },
-        { "Switzerland", "Swiss Franc" },
-        { "Syria", "Syrian Pound" },
-        { "Taiwan", "New Taiwan Dollar" },
-        { "Tajikistan", "Tajikistani Somoni" },
-        { "Tanzania", "Tanzanian Shilling" },
-        { "Thailand", "Thai Baht" },
-        { "Timor", "United States Dollar" },
-        { "Togo", "West African CFA Franc" },
-        { "Tonga", "Tongan Paʻanga" },
-        { "Trinidad & Tobago", "Trinidad and Tobago Dollar" },
-        { "Tunisia", "Tunisian Dinar" },
-        { "Turkey", "Turkish Lira" },
-        { "Turkmenistan", "Turkmenistani Manat" },
-        { "Uganda", "Ugandan Shilling" },
-        { "Ukraine", "Ukrainian Hryvnia" },
-        { "United Arab Emirates", "United Arab Emirates Dirham" },
-        { "United Kingdom", "Sterling" },
-        { "Uruguay", "Uruguayan Peso" },
-        { "Uzbekistan", "Uzbekistani Soʻm" },
-        { "Vanuatu", "Vanuatu Vatu" },
-        { "Venezuela", "Venezuelan Bolívar" },
-        { "Vietnam", "Vietnamese Đồng" },
-        { "Western Samoa", "Samoan Tālā" },
-        { "Yemen", "Yemeni Rial" },
-        { "Zambia", "Zambian Kwacha" },
-        { "Zimbabwe", "Real Time Gross Settlement Dollar" }
+        { UnitCategories.GetHashCode(), "ASCENDING" },
+        { UnitListNoPlural.GetHashCode(), "ASCENDING" }
     };
     /// <summary>
-    /// Sort the <see cref="Database.UnitListNoPlural"/> list ascending or descending.
+    /// Sort a presorted string list ascending or descending in O(n).
     /// </summary>
-    public static void SortUnitListNoPlural(string SortOrder)
+    public static void SortStringList(List<string> List, string SortOrder)
     {
-        if (SortOrder != UnitListNoPluralSortOrder)
+        if (SortOrder != SortOrders[List.GetHashCode()])
         {
-            //Reverse() is used because it is O(n).
-            Database.UnitListNoPlural.Reverse();
-            UnitListNoPluralSortOrder = SortOrder;
+            //Reverse() is O(n) for presorted list.
+            List.Reverse();
+            SortOrders[List.GetHashCode()] = SortOrder;
         }
     }
     /// <summary>
-    /// Gets info about a unit as an <see cref="Entry"/> from cache. Faster than database file.
+    /// Gets info about a unit as a <see cref="UnitEntry"/> from cache. Faster than database file.
     /// </summary>
     /// <returns>
-    /// The <see cref="Entry"/> of the unit if it exists in cache, otherwise an empty <see cref="Entry"/>.
+    /// The <see cref="UnitEntry"/> of the unit if it exists in cache, otherwise <see langword="null"/>.
     /// </returns>
-    public static Entry GetUnitFromCache(string Unit)
+    public static UnitEntry GetUnitFromCache(string Unit)
     {
-        foreach (KeyValuePair<string, Dictionary<string, Entry>> x in UnitCache)
+        foreach ((string Type, Dictionary<string, UnitEntry> Units) in UnitCache)
         {
-            if (x.Value.ContainsKey(Unit))
+            if (Units.ContainsKey(Unit))
             {
-                return x.Value[Unit];
+                return Units[Unit];
             }
         }
-        return new Entry();
+        return null;
     }
     /// <summary>
-    /// Calculates the inexact SI equivalences for certain units which will be stored in <see cref="Database"/>.InexactValues
+    /// Calculates the inexact SI equivalences for the units in the "Inexact Values" table in database.
+    /// Results are stored in <see cref="Database.InexactValues"/>
     /// </summary>
     public static void CalculateInexactValues()
     {
@@ -363,11 +255,12 @@ public static class Database
             { "Arcsecond", Degree / 3600 },
             { "Candela Per Square Foot", CandelaSquareInch / 144 },
             { "Candela Per Square Inch", CandelaSquareInch },
-            { "Centineper", 0.01 * Neper },
             { "Centesimal Minute", Pi / 20000 },
             { "Centesimal Second", Pi / 2000000 },
-            { "Cubic Metre Per Minute", PerMinute },
+            { "Centineper", 0.01 * Neper },
+            { "Circular Mil", Pi * new BigDecimal(16129, -14) },
             { "Cubic Metre Per Hour", PerHour },
+            { "Cubic Metre Per Minute", PerMinute },
             { "Day Per Foot", 86400 * SecondPerFoot },
             { "Day Per Mile", 86400 * SecondPerMile },
             { "Decineper", 0.1 * Neper },
@@ -375,6 +268,7 @@ public static class Database
             { "Degree Per Second", Degree },
             { "Desktop Publishing Pica", Inch / 6 },
             { "Desktop Publishing Point", Inch / 72 },
+            { "Enzyme Unit", new BigDecimal(1, -6) * PerMinute },
             { "Foot Per Day", FootPerHour / 24 },
             { "Foot Per Hour", FootPerHour },
             { "Gigaparsec", 1000000000 * Parsec },
@@ -392,9 +286,11 @@ public static class Database
             { "Litre Per Minute", LitrePerMinute },
             { "Long Assay Ton", LongAT },
             { "Megaparsec", 1000000 * Parsec },
+            { "Metre Diameter Circle", Pi / 4 },
             { "Metre Per Day", PerHour / 24 },
             { "Metre Per Hour", PerHour },
             { "Metre Per Minute", 60 * PerHour },
+            { "Metre Radius Circle", Pi },
             { "Microarcsecond", Degree / 3600000000 },
             { "Mile Per Day", MilePerDay },
             { "Milliarcsecond", Degree / 3600000 },
@@ -441,74 +337,77 @@ public static class Database
         };
     }
     /// <summary>
-    /// Check for database file existence and corruption. Displays message box if there is an issue.
+    /// Check for database file existence and corruption.
     /// </summary>
     /// <returns>
     /// 1 if there are no issues, 0 if database does not exist and -1 if database is corrupted.
     /// </returns>
     public static int Check(string DatabasePath)
     {
-        //Check existence of database file
+        void CheckTable(ref SqliteCommand Command, string Table, ref bool Flag)
+        {
+            Command.CommandText = $"SELECT tbl_name FROM sqlite_schema WHERE tbl_name='{Table}'";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                Flag = Reader.HasRows;
+            }
+        }
         if (File.Exists(DatabasePath))
         {
             using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
             {
                 Connection.Open();
-                //Check info table
                 SqliteCommand Command = Connection.CreateCommand();
-                Command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='Info'";
-                try
-                {
-                    using (SqliteDataReader Reader = Command.ExecuteReader())
-                    {
-                        while (Reader.Read())
-                        {
-                            break;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    return -1;
-                }
-                //Check alternate names table
-                Command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='Alternate Names'";
-                try
-                {
-                    using (SqliteDataReader Reader = Command.ExecuteReader())
-                    {
-                        while (Reader.Read())
-                        {
-                            break;
-                        }
-                    }
-                }
-                catch (Exception)
+                CheckTable(ref Command, "Alternate Names", ref Database.AlternateExist);
+                CheckTable(ref Command, "Binary Prefixes", ref Database.BinaryPrefixExist);
+                CheckTable(ref Command, "Case Sensitive", ref Database.CaseExist);
+                CheckTable(ref Command, "Currency Alias", ref Database.CurrencyExist);
+                CheckTable(ref Command, "Info", ref Database.InfoExist);
+                CheckTable(ref Command, "SI Equivalents", ref Database.SIExists);
+                CheckTable(ref Command, "SI Prefixes", ref Database.SIPrefixExists);
+                CheckTable(ref Command, "Special Units", ref Database.SpecialExist);
+                CheckTable(ref Command, "Temperature Formulas", ref Database.TemperatureExists);
+                if (
+                    !Database.AlternateExist ||
+                    !Database.BinaryPrefixExist ||
+                    !Database.CaseExist ||
+                    !Database.CurrencyExist ||
+                    !Database.InfoExist ||
+                    !Database.SIExists ||
+                    !Database.SIPrefixExists ||
+                    !Database.SpecialExist ||
+                    !Database.TemperatureExists
+                )
                 {
                     return -1;
                 }
-                return 1;
             }
+            return 1;
         }
         return 0;
     }
     /// <summary>
-    /// Creates the <see cref="Database"/>.UnitList, <see cref="Database"/>.UnitListPlural, <see cref="Database"/>.UnitListNoPlural and <see cref="Database"/>.UnitCache.
+    /// Creates the <see cref="Database.UnitList"/>, <see cref="Database.UnitListPlural"/>,
+    /// <see cref="Database.UnitListNoPlural"/> and <see cref="Database.UnitCache"/>.
     /// </summary>
-    public static void GetUnits(string DatabasePath)
+    public static void GetAllUnits(string DatabasePath)
     {
+        //Fault tolerance; app still works if "Alternate Names" table does not exist
+        if (!Database.InfoExist)
+        {
+            return;
+        }
         using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
         {
             Connection.Open();
-            //Query database
             SqliteCommand Command = Connection.CreateCommand();
-            Command.CommandText = "SELECT * FROM Info LEFT JOIN [Alternate Names] ON Info.Unit = [Alternate Names].Unit ORDER BY Unit";
+            //Joined query not used due to low performance
+            //Query Info table
+            Command.CommandText = "SELECT * FROM Info";
             using (SqliteDataReader Reader = Command.ExecuteReader())
             {
-                Entry NewEntry;
-                string PreviousUnit = "";
+                UnitEntry NewEntry;
                 BigDecimal SI;
-                string AlternateName;
                 while (Reader.Read())
                 {
                     //Required values: Unit, Type, SI Equivalent
@@ -525,69 +424,336 @@ public static class Database
                         continue;
                     }
                     //Get unit info
-                    if (Reader.GetString(0) != PreviousUnit)
+                    NewEntry = new UnitEntry();
+                    NewEntry.Unit = Reader.GetString(0);
+                    NewEntry.Type = Reader.GetString(1);
+                    NewEntry.SI = SI;
+                    if (Reader[3].GetType() != typeof(DBNull))
                     {
-                        NewEntry = new Entry();
-                        NewEntry.Unit = Reader.GetString(0);
-                        NewEntry.Type = Reader.GetString(1);
-                        NewEntry.SI = SI;
                         NewEntry.Description = Reader.GetString(3);
-                        UnitList.Add(NewEntry.Unit, NewEntry.Unit);
-                        UnitListNoPlural.Add(NewEntry.Unit);
                     }
-                    else
+                    UnitList.Add(NewEntry.Unit, NewEntry.Unit);
+                    UnitListNoPlural.Add(NewEntry.Unit);
+                    //Cache unit
+                    if (!UnitCache.ContainsKey(NewEntry.Type))
                     {
-                        NewEntry = GetUnitFromCache(PreviousUnit);
+                        UnitCache.Add(NewEntry.Type, new Dictionary<string, UnitEntry>());
+                        UnitCategories.Add(NewEntry.Type);
                     }
-                    //Get alternate names
-                    if (Reader[5].GetType() != typeof(DBNull))
+                    UnitCache[NewEntry.Type].Add(NewEntry.Unit, NewEntry);
+                }
+            }
+            if (Database.AlternateExist)
+            {
+                //Query Alternate Names table
+                Command.CommandText = "SELECT * FROM [Alternate Names]";
+                using (SqliteDataReader Reader = Command.ExecuteReader())
+                {
+                    UnitEntry Entry;
+                    string AlternateName;
+                    while (Reader.Read())
                     {
-                        AlternateName = Reader.GetString(5);
-                        if (Reader[6].GetType() != typeof(DBNull) && Reader.GetString(6) == "T")
+                        //Required values: Unit, Alternate Name
+                        if (
+                            Reader[0].GetType() == typeof(DBNull)
+                            ||
+                            Reader[1].GetType() == typeof(DBNull)
+                        )
                         {
-                            NewEntry.Symbols.Add(AlternateName);
-                            UnitListNoPlural.Add(AlternateName);
+                            continue;
                         }
-                        else if (Reader[7].GetType() != typeof(DBNull) && Reader.GetString(7) == "T")
+                        Entry = GetUnitFromCache(Reader.GetString(0));
+                        if (Entry == null)
                         {
-                            NewEntry.Abbreviations.Add(AlternateName);
-                            UnitListNoPlural.Add(AlternateName);
+                            continue;
                         }
-                        else if (Reader[9].GetType() != typeof(DBNull) && Reader.GetString(9) == "T")
+                        AlternateName = Reader.GetString(1);
+                        if (Reader[4].GetType() != typeof(DBNull) && Reader.GetString(4) == "T")
                         {
-                            NewEntry.Plurals.Add(AlternateName);
+                            Entry.Plurals.Add(AlternateName);
                             UnitListPlural.Add(AlternateName);
                         }
                         //Exclusively not plural
-                        else if (Reader[8].GetType() != typeof(DBNull) && Reader.GetString(8) == "T")
+                        else if (Reader[2].GetType() != typeof(DBNull) && Reader.GetString(2) == "T")
                         {
-                            NewEntry.AmericanSpelling.Add(AlternateName);
+                            Entry.Symbols.Add(AlternateName);
+                            UnitListNoPlural.Add(AlternateName);
+                        }
+                        else if (Reader[3].GetType() != typeof(DBNull) && Reader.GetString(3) == "T")
+                        {
+                            Entry.Abbreviations.Add(AlternateName);
+                            UnitListNoPlural.Add(AlternateName);
+                        }
+                        else if (Reader[5].GetType() != typeof(DBNull) && Reader.GetString(5) == "T")
+                        {
+                            Entry.Variants.Add(AlternateName);
                             UnitListNoPlural.Add(AlternateName);
                         }
                         else
                         {
-                            NewEntry.AlternateNames.Add(AlternateName);
+                            Entry.AlternateNames.Add(AlternateName);
                             UnitListNoPlural.Add(AlternateName);
                         }
                         if (!UnitList.ContainsKey(AlternateName))
                         {
-                            UnitList.Add(AlternateName, NewEntry.Unit);
+                            UnitList.Add(AlternateName, Entry.Unit);
                         }
                     }
-                    //Cache unit
-                    if (!UnitCache.ContainsKey(NewEntry.Type))
+                }
+            }
+            UnitCategories.Sort();
+            UnitListNoPlural.Sort();
+        }
+    }
+    /// <summary>
+    /// Get all binary prefixes from the "Binary Prefixes" table in the database file and store it in
+    /// <see cref="Database.BinaryPrefixes"/>.
+    /// </summary>
+    public static void GetBinaryPrefixes(string DatabasePath)
+    {
+        //Redundancy
+        if (!Database.BinaryPrefixExist)
+        {
+            Database.BinaryPrefixes = RedundantData.BinaryPrefixes;
+            return;
+        }
+        using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
+        {
+            Connection.Open();
+            SqliteCommand Command = Connection.CreateCommand();
+            Command.CommandText = "SELECT * FROM [Binary Prefixes]";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                while (Reader.Read())
+                {
+                    //Required values: Prefix, Factor, Standard Form
+                    if (
+                        Reader[0].GetType() == typeof(DBNull)
+                        ||
+                        Reader[2].GetType() == typeof(DBNull)
+                        ||
+                        Reader[3].GetType() == typeof(DBNull)
+                    )
                     {
-                        UnitCache.Add(NewEntry.Type, new Dictionary<string, Entry>());
+                        continue;
                     }
-                    if (!UnitCache[NewEntry.Type].ContainsKey(NewEntry.Unit))
-                    {
-                        UnitCache[NewEntry.Type].Add(NewEntry.Unit, NewEntry);
-                    }
-                    PreviousUnit = NewEntry.Unit;
+                    Database.BinaryPrefixes.Add(Reader.GetString(0), new PrefixEntry(Reader.GetString(0), Reader.GetString(1), Reader.GetString(2), Reader.GetString(3), Reader.GetString(4)));
                 }
             }
         }
-        UnitListNoPlural.Sort();
+    }
+    /// <summary>
+    /// Get all case sensitive units from the "Case Sensitive" table in the database file and store it in
+    /// <see cref="Database.CasingList"/>.
+    /// </summary>
+    public static void GetCaseSensitive(string DatabasePath)
+    {
+        //Redundancy
+        if (!Database.CaseExist)
+        {
+            Database.CasingList = RedundantData.CasingList;
+            return;
+        }
+        using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
+        {
+            Connection.Open();
+            SqliteCommand Command = Connection.CreateCommand();
+            Command.CommandText = "SELECT * FROM [Case Sensitive]";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                while (Reader.Read())
+                {
+                    //Required values: Unit
+                    if (
+                        Reader[0].GetType() == typeof(DBNull)
+                    )
+                    {
+                        continue;
+                    }
+                    Database.CasingList.Add(Reader.GetString(0));
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// Get all currency aliases from the "Currency Alias" table in the database file and store it in
+    /// <see cref="Database.CurrencyAlias"/>.
+    /// </summary>
+    public static void GetCurrencyAliases(string DatabasePath)
+    {
+        //Redundancy
+        if (!Database.CurrencyExist)
+        {
+            Database.CurrencyAlias = RedundantData.CurrencyAlias;
+            return;
+        }
+        using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
+        {
+            Connection.Open();
+            SqliteCommand Command = Connection.CreateCommand();
+            Command.CommandText = "SELECT * FROM [Currency Alias]";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                while (Reader.Read())
+                {
+                    //Required values: API Country, Unit
+                    if (
+                        Reader[0].GetType() == typeof(DBNull)
+                        ||
+                        Reader[1].GetType() == typeof(DBNull)
+                    )
+                    {
+                        continue;
+                    }
+                    Database.CurrencyAlias.Add(Reader.GetString(0), Reader.GetString(1));
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// Get all units from the "Special Units" table in the database file and store it in
+    /// <see cref="Database.SpecialUnits"/>.
+    /// </summary>
+    public static void GetSpecialUnits(string DatabasePath)
+    {
+        //Redundancy
+        if (!Database.SpecialExist)
+        {
+            Database.SpecialUnits = RedundantData.SpecialUnits;
+            return;
+        }
+        using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
+        {
+            Connection.Open();
+            SqliteCommand Command = Connection.CreateCommand();
+            Command.CommandText = "SELECT * FROM [Special Units]";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                while (Reader.Read())
+                {
+                    //Required values: Unit
+                    if (
+                        Reader[0].GetType() == typeof(DBNull)
+                    )
+                    {
+                        continue;
+                    }
+                    Database.SpecialUnits.Add(Reader.GetString(0));
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// Get all SI equivalents from the "SI Equivalents" table in the database file and store it in
+    /// <see cref="Database.SIEquivalents"/>.
+    /// </summary>
+    public static void GetSIEquivalents(string DatabasePath)
+    {
+        //Redundancy
+        if (!Database.SIExists)
+        {
+            Database.SIEquivalents = RedundantData.SIEquivalents;
+            return;
+        }
+        using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
+        {
+            Connection.Open();
+            SqliteCommand Command = Connection.CreateCommand();
+            Command.CommandText = "SELECT * FROM [SI Equivalents]";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                while (Reader.Read())
+                {
+                    //Required values: Type, Unit
+                    if (
+                        Reader[0].GetType() == typeof(DBNull)
+                        ||
+                        Reader[1].GetType() == typeof(DBNull)
+                    )
+                    {
+                        continue;
+                    }
+                    Database.SIEquivalents.Add(Reader.GetString(0), Reader.GetString(1));
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// Get all SI prefixes from the "SI Prefixes" table in the database file and store it in
+    /// <see cref="Database.SIPrefixes"/>.
+    /// </summary>
+    public static void GetSIPrefixes(string DatabasePath)
+    {
+        //Redundancy
+        if (!Database.SIPrefixExists)
+        {
+            Database.SIPrefixes = RedundantData.SIPrefixes;
+            return;
+        }
+        using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
+        {
+            Connection.Open();
+            SqliteCommand Command = Connection.CreateCommand();
+            Command.CommandText = "SELECT * FROM [SI Prefixes]";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                while (Reader.Read())
+                {
+                    //Required values: Prefix, Factor, Standard Form
+                    if (
+                        Reader[0].GetType() == typeof(DBNull)
+                        ||
+                        Reader[2].GetType() == typeof(DBNull)
+                        ||
+                        Reader[3].GetType() == typeof(DBNull)
+                    )
+                    {
+                        continue;
+                    }
+                    Database.SIPrefixes.Add(Reader.GetString(0), new PrefixEntry(Reader.GetString(0), Reader.GetString(1), Reader.GetString(2), Reader.GetString(3), Reader.GetString(4)));
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// Get all temperature formulas from the "Temperature Formulas" table in the database file and store it in
+    /// <see cref="Database.TemperatureFormulas"/>.
+    /// </summary>
+    public static void GetTemperatureFormulas(string DatabasePath)
+    {
+        if (!Database.TemperatureExists)
+        {
+            Database.TemperatureFormulas = RedundantData.TemperatureFormulas;
+            return;
+        }
+        using (SqliteConnection Connection = new SqliteConnection($"Data Source={DatabasePath};Mode=ReadOnly"))
+        {
+            Connection.Open();
+            SqliteCommand Command = Connection.CreateCommand();
+            Command.CommandText = "SELECT * FROM [Temperature Formulas]";
+            using (SqliteDataReader Reader = Command.ExecuteReader())
+            {
+                while (Reader.Read())
+                {
+                    //Required values: From, To, Equation
+                    if (
+                        Reader[0].GetType() == typeof(DBNull)
+                        ||
+                        Reader[1].GetType() == typeof(DBNull)
+                        ||
+                        Reader[2].GetType() == typeof(DBNull)
+                    )
+                    {
+                        continue;
+                    }
+                    if (!Database.TemperatureFormulas.ContainsKey(Reader.GetString(0)))
+                    {
+                        Database.TemperatureFormulas[Reader.GetString(0)] = new Dictionary<string, Tuple<string, string>>();
+                    }
+                    Database.TemperatureFormulas[Reader.GetString(0)][Reader.GetString(1)] = new Tuple<string, string>(Reader.GetString(2), Reader.GetString(3));
+                }
+            }
+        }
     }
     /// <summary>
     /// Check for internet connection.
@@ -599,8 +765,12 @@ public static class Database
     {
         try
         {
-            IPHostEntry Access = Dns.GetHostEntry("1.1.1.1");
-            return true;
+            HttpClient Client = new HttpClient();
+            HttpRequestMessage Request = new HttpRequestMessage(HttpMethod.Head, "https://www.nist.gov");
+            using (HttpResponseMessage WebResponse = Client.Send(Request))
+            {
+                return true;
+            }
         }
         catch
         {
@@ -608,10 +778,10 @@ public static class Database
         }
     }
     /// <summary>
-    /// Get the current time from an NTP server in local time zone.
+    /// Get the current time from an NTP server in UTC.
     /// </summary>
     /// <returns>
-    /// <see cref="DateTime"/> of the current time in local time zone.
+    /// <see cref="DateTime"/> of the current time in UTC.
     /// </returns>
     public static DateTime GetDateTime(string NTPServer)
     {
@@ -619,7 +789,7 @@ public static class Database
         NTPData[0] = 0x1B;
         IPAddress[] Addresses = Dns.GetHostEntry(NTPServer).AddressList;
         IPEndPoint IPEndpoint = new IPEndPoint(Addresses[0], 123);
-        using (var Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+        using (Socket Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
         {
             Socket.Connect(IPEndpoint);
             Socket.ReceiveTimeout = 2000;
@@ -635,17 +805,16 @@ public static class Database
             SecondFraction = 256 * SecondFraction + NTPData[TransmitTimeOffset + i + 4];
         }
         ulong Milliseconds = (Seconds * 1000) + ((SecondFraction * 1000) / 0x100000000L);
-        DateTime Time = (new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc)).AddMilliseconds((long)Milliseconds);
-        return Time;
+        return new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds((long)Milliseconds);
     }
     /// <summary>
     /// Updates the year and quarter for <see cref="Database.CurrencyAPI"/>.
     /// </summary>
-    public static void UpdateCurrencyAPI(bool UseOldData = false)
+    public static void UpdateCurrencyAPI()
     {
         DateTime Today = GetDateTime("time.nist.gov");
-        Database.APIYear = int.Parse(Today.ToString("yyyy"));
-        int CurrentMonth = int.Parse(Today.ToString("MM"));
+        Database.APIYear = Today.Year;
+        int CurrentMonth = Today.Month;
         if (CurrentMonth <= 3) //Before Q1
         {
             Database.APIQuarter = 4;
@@ -681,6 +850,10 @@ public static class Database
                 using (StreamReader Reader = new StreamReader(WebResponse.Content.ReadAsStream()))
                 {
                     Results = JsonSerializer.Deserialize<Root>(Reader.ReadToEnd());
+                    if (Results.data.Length == 0)
+                    {
+                        return false;
+                    }
                     return true;
                 }
             }
@@ -694,52 +867,69 @@ public static class Database
     /// <summary>
     /// Updates the database file and <see cref="Database.UnitCache"/> with new exchange rates.
     /// </summary>
-    /// /// <returns>
+    /// <returns>
     /// 1 if the database was successfully updated, 0 if no internet connection, -1 for all other errors.
     /// </returns>
     public static int UpdateCurrencies(string DatabasePath)
     {
-        if (CheckInternet() == false)
+        if (!CheckInternet())
         {
             return 0;
         }
-        UpdateCurrencyAPI();
-        //Data
-        Datum[] Page1 = null;
-        Datum[] Page2 = null;
-        Datum[] Data = null;
+        try
+        {
+            UpdateCurrencyAPI();
+        }
+        catch
+        {
+            return -1;
+        }
+        Datum[] Page1;
+        Datum[] Page2;
+        Datum[] Data;
         List<Datum> Currencies = new List<Datum>();
         //Get first page
         Root Response;
         bool Status = GetCurrencyData(Database.CurrencyAPI, out Response);
-        if (Status == false)
+        if (!Status)
         {
-            return -1;
-        }
-        if (Response == null)
-        {
-            //Go back one quarter if no data
-            if (Database.APIQuarter == 1)
+            int Low = 8005; //2001 Q1 in number of quarters
+            int Middle;
+            int High = Database.APIYear * 4 + Database.APIQuarter;
+            while (Low < High)
             {
-                Database.APIQuarter = 4;
-                Database.APIYear -= 1;
+                Middle = (Low + High) / 2;
+                (Database.APIYear, Database.APIQuarter) = Math.DivRem(Middle, 4);
+                if (Database.APIQuarter == 0)
+                {
+                    Database.APIQuarter = 4;
+                    Database.APIYear -= 1;
+                }
+                if (Status = GetCurrencyData(Database.CurrencyAPI, out Response))
+                {
+                    if (Low == Middle)
+                    {
+                        break;
+                    }
+                    Low = Middle;
+                }
+                else
+                {
+                    High = Middle;
+                }
             }
-            else
+            if (!Status)
             {
-                Database.APIQuarter -= 1;
+                return -1;
             }
-            return UpdateCurrencies(DatabasePath);
         }
         Page1 = Response.data;
         //Get next page
-        if (Response.links.next != null)
-        {
-            GetCurrencyData(Database.CurrencyAPI + Response.links.next, out Response);
-            Page2 = Response.data;
-        }
+        Status = Response.links.next != null ? GetCurrencyData(Database.CurrencyAPI + Response.links.next, out Response) : false;
         //Aggregate data
-        if (Page2 != null)
+        if (Status)
         {
+            Page2 = Response.data;
             Data = new Datum[Page1.Length + Page2.Length];
             Page1.CopyTo(Data, 0);
             Page2.CopyTo(Data, Page1.Length);
@@ -748,6 +938,8 @@ public static class Database
         {
             Data = Page1;
         }
+        //Filter results
+        int LastItem;
         for (int i = 0; i < Data.Length; i++)
         {
             //Currencies no longer used
@@ -755,17 +947,33 @@ public static class Database
                 Data[i].currency.Equals("Chavito", StringComparison.OrdinalIgnoreCase)
                 ||
                 Data[i].currency.Equals("Fuerte (OLD)", StringComparison.OrdinalIgnoreCase)
+                ||
+                Data[i].currency.Equals("Old Leone", StringComparison.OrdinalIgnoreCase)
             )
             {
                 continue;
             }
             else
             {
-                //Remove duplicates with earlier date
-                Datum Item = Currencies.Find(item => item.country.Equals(Data[i].country, StringComparison.OrdinalIgnoreCase));
-                if (Item != null && Currencies.Contains(Item))
+                //Remove duplicate with earlier date
+                if (Currencies.Count > 0)
                 {
-                    Currencies.Remove(Item);
+                    LastItem = Currencies.Count - 1;
+                    if (
+                        Currencies[LastItem].country.Equals(Data[i].country, StringComparison.OrdinalIgnoreCase)
+                        &&
+                        Currencies[LastItem].currency.Equals(Data[i].currency, StringComparison.OrdinalIgnoreCase)
+                    )
+                    {
+                        if (Currencies[LastItem].effective_date.CompareTo(Data[i].effective_date) == -1)
+                        {
+                            Currencies.RemoveAt(LastItem);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
                 }
                 Currencies.Add(Data[i]);
             }
@@ -774,45 +982,41 @@ public static class Database
         {
             string Currency;
             string USDEquivalent;
-            string Query;
             HashSet<string> UpdatedCurrencies = new HashSet<string>();
-            //Open connection
             Connection.Open();
-            //Create command
             SqliteCommand Command = Connection.CreateCommand();
             using (SqliteTransaction Transaction = Connection.BeginTransaction())
             {
                 Command.Transaction = Transaction;
-                foreach (Datum x in Currencies)
+                try
                 {
-                    //Get name from database
-                    if (!Database.CurrencyAlias.ContainsKey(x.country))
+                    foreach (Datum x in Currencies)
                     {
-                        continue;
+                        //Get name from database
+                        if (!Database.CurrencyAlias.ContainsKey(x.country))
+                        {
+                            continue;
+                        }
+                        Currency = Database.CurrencyAlias[x.country];
+                        //Avoid duplicate updates for countries that use same currency
+                        if (UpdatedCurrencies.Contains(Currency))
+                        {
+                            continue;
+                        }
+                        UpdatedCurrencies.Add(Currency);
+                        //Write to database
+                        USDEquivalent = decimal.Round(1 / decimal.Parse(x.exchange_rate), 20).ToString();
+                        Command.CommandText = $"UPDATE Info SET [SI Equivalent] = '{USDEquivalent}' WHERE Unit = '{Currency}'";
+                        Command.ExecuteNonQuery();
+                        //Update cache
+                        Database.UnitCache["Currency"][Currency].SI = BigDecimal.Parse(USDEquivalent);
                     }
-                    Currency = Database.CurrencyAlias[x.country];
-                    //Avoid duplicate updates for countries that use same currency
-                    if (UpdatedCurrencies.Contains(Currency))
-                    {
-                        continue;
-                    }
-                    UpdatedCurrencies.Add(Currency);
-                    //Write to database
-                    USDEquivalent = decimal.Round(1 / decimal.Parse(x.exchange_rate), 20).ToString();
-                    Query = $"UPDATE Info SET [SI Equivalent] = '{USDEquivalent}' WHERE Unit = '{Currency}'";
-                    Command.CommandText = Query;
-                    Command.ExecuteNonQuery();
+                    Transaction.Commit();
                 }
-                Transaction.Commit();
-                Command.Transaction = null;
-            }
-            //Update cache
-            Command.CommandText = "SELECT Unit, [SI Equivalent] FROM Info WHERE Type = 'Currency'";
-            using (SqliteDataReader Reader = Command.ExecuteReader())
-            {
-                while (Reader.Read())
+                catch (Exception)
                 {
-                    Database.UnitCache["Currency"][Reader.GetString(0)].SI = BigDecimal.Parse(Reader.GetString(1));
+                    Transaction.Rollback();
+                    return -1;
                 }
             }
         }
@@ -824,76 +1028,65 @@ public static class Database
 /// </summary>
 public static class Search
 {
-    readonly static char[] Digits = "0123456789".ToCharArray();
     /// <summary>
-    /// Get first non-digit index of a given string. This does not include scientific notation,
-    /// separator symbols or "-" signs.
+    /// <see cref="char"/>[] of the digits 0-9.
+    /// </summary>
+    public readonly static char[] Digits = "0123456789".ToCharArray();
+    /// <summary>
+    /// Characters reserved for internal functions.
+    /// </summary>
+    public static HashSet<string> ReservedCharacters = new HashSet<string>
+    {
+        { "-" },
+        { "−" },
+        { "E" },
+        { "e" },
+    };
+    /// <summary>
+    /// Get the index of the unit name in a query string.
     /// </summary>
     /// <returns>
-    /// An <see cref="int"/> of the first non-digit index or -1 if there is none.
+    /// An <see cref="int"/> of the unit name index or -1 if there is none.
     /// </returns>
-    public static int FirstNonDigitIndex(string Text, char[] SeparatorSymbols)
+    public static int UnitNameIndex(string Text, char[] SeparatorSymbols)
     {
-        int i = 0;
-        while (i < Text.Length)
+        char Character;
+        bool Digit;
+        bool Separator;
+        bool Minus;
+        int Conditional = -1;
+        for (int i = 0; i < Text.Length; i++)
         {
-            char Character = Text[i];
-            if (!Digits.Contains(Character) && !SeparatorSymbols.Contains(Character))
+            Character = Text[i];
+            Digit = Digits.Contains(Character);
+            Separator = SeparatorSymbols.Contains(Character);
+            Minus = Character == '-' || Character == '−' ? true : false;
+            if (!Digit && !Separator && !Minus)
             {
-                //Check if scientific notation "E" accounting for "-" signs
-                if (Character == 'E' && i + 1 < Text.Length)
+                if (Conditional == -1)
                 {
-                    if (Digits.Contains(Text[i + 1]))
+                    if (char.ToUpper(Character) == 'E')
                     {
-                        i += 2;
+                        Conditional = i;
                         continue;
                     }
-                    else if (
-                        Text[i + 1] == '-'
-                        &&
-                        i + 2 < Text.Length
-                    )
-                    {
-                        if (Digits.Contains(Text[i + 2]))
-                        {
-                            i += 3;
-                            continue;
-                        }
-                    }
+                    return i;
                 }
-                return i;
+                return Conditional;
             }
-            i++;
+            else if (Digit)
+            {
+                Conditional = -1;
+            }
         }
         return -1;
     }
-    public static int LongestSubsequence(string a, string b)
-    {
-        int[,] Matrix = new int[a.Length + 1, b.Length + 1];
-        for (int i = 0; i <= a.Length; i++)
-        {
-            Matrix[i, 0] = 0;
-        }
-        for (int i = 0; i <= b.Length; i++)
-        {
-            Matrix[0, i] = 0;
-        }
-        for (int i = 1; i <= a.Length; i++)
-        {
-            for (int j = 1; j <= b.Length; j++)
-            {
-                if (a[i - 1] == b[j - 1])
-                {
-                    Matrix[i, j] = Matrix[i - 1, j - 1] + 1;
-                }
-                else
-                {
-                    Matrix[i, j] = Math.Max(Matrix[i - 1, j], Matrix[i, j - 1]);
-                }
-            }
-        }
-        return Matrix[a.Length, b.Length];
-    }
+    /// <summary>
+    /// Calculate longest substring between two strings.
+    /// </summary>
+    /// <returns>
+    /// The length of the longest substring as an <see cref="int"/>.
+    /// </returns>
     public static int LongestSubstring(string a, string b)
     {
         int Longest = 0;
@@ -926,129 +1119,167 @@ public static class Search
         return Longest;
     }
     /// <summary>
+    /// Calculate longest subsequence between two strings.
+    /// </summary>
+    /// <returns>
+    /// The length of the longest subsequences as an <see cref="int"/>.
+    /// </returns>
+    public static int LongestSubsequence(string a, string b)
+    {
+        int[,] Matrix = new int[a.Length + 1, b.Length + 1];
+        for (int i = 0; i <= a.Length; i++)
+        {
+            Matrix[i, 0] = 0;
+        }
+        for (int i = 0; i <= b.Length; i++)
+        {
+            Matrix[0, i] = 0;
+        }
+        for (int i = 1; i <= a.Length; i++)
+        {
+            for (int j = 1; j <= b.Length; j++)
+            {
+                if (a[i - 1] == b[j - 1])
+                {
+                    Matrix[i, j] = Matrix[i - 1, j - 1] + 1;
+                }
+                else
+                {
+                    Matrix[i, j] = Math.Max(Matrix[i - 1, j], Matrix[i, j - 1]);
+                }
+            }
+        }
+        return Matrix[a.Length, b.Length];
+    }
+    /// <summary>
+    /// Calculate the similarity between two unit names <paramref name="Query"/> which is a user input
+    /// and <paramref name="Reference"/> which is a name from database.
+    /// </summary>
+    /// <returns>
+    /// <see cref="Tuple{float, float, float}"/> of the similarity in the format
+    /// (Longest Subsequence, Longest Subsequence Case Percentage, Longest Substring).
+    /// </returns>
+    private static Tuple<float, float, float> Similarity(string Query, string Reference)
+    {
+        string QueryUpper = Query.ToUpper();
+        string ReferenceUpper = Reference.ToUpper();
+        int MaxLength = Math.Max(Query.Length, Reference.Length);
+        float SubstringNoCase = LongestSubstring(QueryUpper, ReferenceUpper);
+        float SubsequenceNoCase = LongestSubsequence(QueryUpper, ReferenceUpper);
+        if (Database.CasingList.Contains(ReferenceUpper))
+        {
+            float SubsequenceCase = LongestSubsequence(Query, Reference);
+            return new Tuple<float, float, float>(SubstringNoCase, SubsequenceNoCase, SubsequenceCase / MaxLength);
+        }
+        return new Tuple<float, float, float>(SubstringNoCase, SubsequenceNoCase, SubsequenceNoCase / MaxLength);
+    }
+    /// <summary>
     /// Compares two best matches.
     /// </summary>
     /// <returns>
     /// -1 if <paramref name="x"/> precedes <paramref name="y"/>, 0 if <paramref name="x"/> and <paramref name="y"/>
     /// are in the same position and 1 if <paramref name="x"/> comes after <paramref name="y"/>.
     /// </returns>
-    private static int CompareBest(Tuple<string, int, int> x, Tuple<string, int, int> y)
+    private static int CompareBest(Tuple<string, float, float, float> x, Tuple<string, float, float, float> y)
     {
-        if (x.Item1.Length < y.Item1.Length) //Shortest strings rank first
+        if (x.Item2 > y.Item2)
         {
             return -1;
         }
-        else if (x.Item1.Length == y.Item1.Length && x.Item3 > y.Item3) //Case sensitive preferred
+        if (x.Item2 == y.Item2)
         {
-            return -1;
-        }
-        else if (x.Item1.Length == y.Item1.Length && x.Item3 == y.Item3) //Alphabetize if same
-        {
-            return x.Item1.CompareTo(y.Item1);
+            if (x.Item3 > y.Item3)
+            {
+                return -1;
+            }
+            if (x.Item3 == y.Item3)
+            {
+                if (x.Item4 > y.Item4)
+                {
+                    return -1;
+                }
+                if (x.Item4 == y.Item4)
+                {
+                    int Length = x.Item1.Length.CompareTo(y.Item1.Length);
+                    if (Length == 0)
+                    {
+                        return x.Item1.CompareTo(y.Item1); //Alphabetize if length is same
+                    }
+                    return Length;
+                }
+            }
         }
         return 1;
     }
     /// <summary>
-    /// Get best matches of a unit name from database.
+    /// Get best matches of a unit name from database. If <paramref name="Type"/> is specified, matches will
+    /// only be performed for units of that type as stored in <see cref="Database.UnitCache"/>.
     /// </summary>
     /// <returns>
-    /// A <see langword="List"/> of the best matches of a unit name from the
-    /// database and the number of matching characters as a <see cref="KeyValuePair"/>.
+    /// A <see langword="List"/> of the best matches of the given unit name sorted in order from best to
+    /// worst.
     /// </returns>
-    public static List<string> BestMatches(string Unit)
+    public static List<string> BestMatches(string Unit, string Type = "")
     {
-        List<Tuple<string, int, int>> SubsequenceMatches = new List<Tuple<string, int, int>>();
-        List<Tuple<string, int, int>> SubstringMatches = new List<Tuple<string, int, int>>();
-        int SubsequenceBest = 0;
-        int SubstringBest = 0;
-        int Casing = 0; //0 means case insensitive, 1 means case sensitive
-        int SubsequenceScore;
-        int SubstringScore;
-        int Case1;
-        int Case2;
-        int NoCase1;
-        int NoCase2;
-        foreach (KeyValuePair<string, string> x in Database.UnitList)
+        List<Tuple<string, float, float, float>> Matches = new List<Tuple<string, float, float, float>>();
+        Tuple<float, float, float> Match;
+        if (Type != "")
         {
-            Case1 = LongestSubsequence(Unit, x.Key); //Case sensitive
-            NoCase1 = LongestSubsequence(Unit.ToUpper(), x.Key.ToUpper()); //Case insensitive
-            Case2 = LongestSubstring(Unit, x.Key);
-            NoCase2 = LongestSubstring(Unit.ToUpper(), x.Key.ToUpper());
-            //Determine if case insensitive match is better based on percentage
-            if ((float)NoCase1 / x.Key.Length > (float)Case1 / x.Key.Length)
+            List<string> NameList;
+            foreach ((string Name, UnitEntry x) in Database.UnitCache[Type])
             {
-                SubsequenceScore = NoCase1;
-                Casing = 0;
-            }
-            else //Case sensitivity is preferred as it best captures meaning of inexact query
-            {
-                SubsequenceScore = Case1;
-                Casing = 1;
-            }
-            if ((float)NoCase2 / x.Key.Length > (float)Case2 / x.Key.Length)
-            {
-                SubstringScore = NoCase2;
-                Casing = 0;
-            }
-            else
-            {
-                SubstringScore = Case2;
-                Casing = 1;
-            }
-            //Add to list only if equal or better than best
-            if (SubsequenceScore > 0)
-            {
-                if (SubsequenceScore >= SubsequenceBest)
+                NameList = new List<string>(
+                    x.Symbols
+                    .Concat(x.Abbreviations)
+                    .Concat(x.AlternateNames)
+                    .Concat(x.Plurals)
+                    .Concat(x.Variants)
+                ) { x.Unit };
+                foreach (string Unit2 in NameList)
                 {
-                    SubsequenceMatches.Add(new Tuple<string, int, int>(x.Key, SubsequenceScore, Casing));
-                    SubsequenceBest = SubsequenceScore;
-                }
-            }
-            if (SubstringScore > 0)
-            {
-                if (SubstringScore >= SubstringBest)
-                {
-                    SubstringMatches.Add(new Tuple<string, int, int>(x.Key, SubstringScore, Casing));
-                    SubstringBest = SubstringScore;
+                    Match = Similarity(Unit, Unit2);
+                    if (Match.Item1 > 0)
+                    {
+                        Matches.Add(new Tuple<string, float, float, float>(Unit2, Match.Item1, Match.Item2, Match.Item3));
+                    }
                 }
             }
         }
-        if (SubsequenceBest > SubstringBest + 2) //+2 adjustment because longest common substring is preferred
+        else
         {
-            SubsequenceMatches.RemoveAll(x => x.Item2 != SubsequenceBest);
-            SubsequenceMatches.Sort(CompareBest);
-            return SubsequenceMatches.ConvertAll(x => x.Item1);
+            foreach ((string Secondary, string Primary) in Database.UnitList)
+            {
+                Match = Similarity(Unit, Secondary);
+                if (Match.Item1 > 0)
+                {
+                    Matches.Add(new Tuple<string, float, float, float>(Secondary, Match.Item1, Match.Item2, Match.Item3));
+                }
+            }
         }
-        else //Longest common substring is preferred as it best captures meaning of an inexact query
+        Matches.Sort(CompareBest);
+        if (Matches.Count > 20)
         {
-            SubstringMatches.RemoveAll(x => x.Item2 != SubstringBest);
-            SubstringMatches.Sort(CompareBest);
-            return SubstringMatches.ConvertAll(x => x.Item1);
+            Matches.RemoveRange(20, Matches.Count - 20);
         }
+        return Matches.ConvertAll(x => x.Item1);
     }
     /// <summary>
-    /// Get best plural form for a given unit from a given list of plurals.
+    /// Get best match for a given <paramref name="Unit"/> from a given list of strings.
     /// </summary>
     /// <returns>
-    /// A <see cref="string"/> that represents the best plural form.
+    /// A <see cref="string"/> that represents the best match.
     /// </returns>
-    public static string BestPlural(string Unit, List<string> Plurals)
+    public static string BestMatchFromList(string Unit, List<string> List)
     {
-        List<Tuple<string, int>> SubsequenceMatches = new List<Tuple<string, int>>();
-        int SubsequenceBest = 0;
-        int SubsequenceScore;
-        foreach (string x in Plurals)
+        List<Tuple<string, float, float, float>> Matches = new List<Tuple<string, float, float, float>>();
+        Tuple<float, float, float> Match;
+        foreach (string Unit2 in List)
         {
-            SubsequenceScore = LongestSubsequence(Unit, x);
-            if (SubsequenceScore >= SubsequenceBest)
-            {
-                SubsequenceMatches.Add(new Tuple<string, int>(x, SubsequenceScore));
-                SubsequenceBest = SubsequenceScore;
-            }
+            Match = Similarity(Unit, Unit2);
+            Matches.Add(new Tuple<string, float, float, float>(Unit2, Match.Item1, Match.Item2, Match.Item3));
         }
-        SubsequenceMatches.RemoveAll(x => x.Item2 != SubsequenceBest);
-        SubsequenceMatches.Sort((x, y) => x.Item1.Length.CompareTo(y.Item1.Length));
-        return SubsequenceMatches[0].Item1;
+        Matches.Sort(CompareBest);
+        return Matches[0].Item1;
     }
 }
 /// <summary>
@@ -1061,13 +1292,13 @@ public static class Calculate
     /// </summary>
     public static BigDecimal Magnitude;
     /// <summary>
-    /// <see cref="Entry"/> for unit 1, the default unit.
+    /// <see cref="UnitEntry"/> for unit 1, the default unit.
     /// </summary>
-    public static Entry Unit1;
+    public static UnitEntry Unit1;
     /// <summary>
-    /// <see cref="Entry"/> for unit 2, the unit to convert to.
+    /// <see cref="UnitEntry"/> for unit 2, the unit to convert to.
     /// </summary>
-    public static Entry Unit2;
+    public static UnitEntry Unit2;
     /// <summary>
     /// List of <see cref="string"/> units that best matches <see cref="Calculate.Unit1"/>.
     /// </summary>
@@ -1093,18 +1324,18 @@ public static class Calculate
     /// </summary>
     public static BigDecimal SmallMagnitude = new BigDecimal(1, -10);
     /// <summary>
-    /// Stores the results of the conversion.
+    /// Stores the results of the conversion as a tuple of strings in the format (magnitude, unit).
     /// </summary>
-    public static List<string> Results = new List<string>();
+    public static List<Tuple<string,string>> Results = new List<Tuple<string, string>>();
     /// <summary>
     /// Converts between special temperature units that require specific equations with a given magnitude.
     /// </summary>
     /// <returns>
     /// A <see cref="BigDecimal"/> of the conversion.
     /// </returns>
-    public static BigDecimal Temperature(BigDecimal Magnitude, string Unit1, string Unit2)
+    private static BigDecimal Temperature(BigDecimal Magnitude, string Unit1, string Unit2)
     {
-        //Equations from https://en.wikipedia.org/wiki/Conversion_of_scales_of_temperature
+        //Equations from https://web.archive.org/web/20220816165639/https://en.wikipedia.org/wiki/Conversion_of_scales_of_temperature
         if (Unit1 == "Kelvin")
         {
             if (Unit2 == "Celsius")
@@ -1356,11 +1587,43 @@ public static class Calculate
         return Magnitude;
     }
     /// <summary>
-    /// Calculate conversions.
+    /// Converts <paramref name="Unit1"/> to <paramref name="Unit2"/> using given a <paramref name="Magnitude"/>.
     /// </summary>
-    public static void Conversions()
+    /// <returns>
+    /// A <see cref="Tuple{string, string}"/> of the conversion.
+    /// </returns>
+    private static Tuple<string, string> Convert(BigDecimal Magnitude, UnitEntry Unit1, UnitEntry Unit2)
     {
-        //Get unit 1 SI equivalent
+        Tuple<string, string> Result(string Value, bool Plural = false)
+        {
+            List<string> NameList;
+            if (Plural)
+            {
+                NameList = Unit2.Plurals;
+            }
+            else
+            {
+                NameList = new List<string>(Unit2.AlternateNames.Concat(Unit2.Variants))
+                {
+                    Unit2.Unit
+                };
+            }
+            //BestMatchFromList() is used to show results similar to user query e.g. meter vs metre
+            if (Calculate.QueryType == "CONVERT")
+            {
+                if (NameList.Count == 0)
+                {
+                    return new Tuple<string, string>(Value, Unit2BestMatches[0]);
+                }
+                return new Tuple<string, string>(Value, Search.BestMatchFromList(Unit2BestMatches[0], NameList));
+            }
+            if (NameList.Count == 0)
+            {
+                return new Tuple<string, string>(Value, Unit1BestMatches[0]);
+            }
+            return new Tuple<string, string>(Value, Search.BestMatchFromList(Unit1BestMatches[0], NameList));
+        }
+        BigDecimal Conversion;
         BigDecimal Unit1SI;
         BigDecimal Unit2SI;
         if (Database.InexactValues.ContainsKey(Unit1.Unit))
@@ -1371,78 +1634,90 @@ public static class Calculate
         {
             Unit1SI = Magnitude * Unit1.SI;
         }
-        BigDecimal Conversion;
-        string ConversionString;
-        Results.Clear();
-        //Info mode
-        if (QueryType == "INFO")
+        if (Database.InexactValues.ContainsKey(Unit2.Unit))
         {
-            Results = new List<string>(Unit1BestMatches);
+            Unit2SI = Database.InexactValues[Unit2.Unit];
         }
+        else
+        {
+            Unit2SI = Unit2.SI;
+        }
+        if (Unit2SI == 0) //Division by 0
+        {
+            return Result("∞", true);
+        }
+        if (
+            Unit1.Type == "Temperature"
+            &&
+            Database.SpecialUnits.Contains(Unit1.Unit)
+            &&
+            Database.SpecialUnits.Contains(Unit2.Unit)
+        )
+        {
+            Conversion = Calculate.Temperature(Magnitude, Unit1.Unit, Unit2.Unit).Round(SignificantFigures);
+        }
+        else if (Unit1.Type == "Temperature" && Database.SpecialUnits.Contains(Unit1.Unit))
+        {
+            Conversion = (Calculate.Temperature(Magnitude, Unit1.Unit, "Kelvin") / Unit2SI).Round(SignificantFigures);
+        }
+        else if (Unit1.Type == "Temperature" && Database.SpecialUnits.Contains(Unit2.Unit))
+        {
+            Conversion = Calculate.Temperature(Unit1SI, "Kelvin", Unit2.Unit).Round(SignificantFigures);
+        }
+        else if (
+            (Unit1.Type == "Speed,Velocity" || Unit1.Type == "Fuel Efficiency")
+            &&
+            (
+                (Database.SpecialUnits.Contains(Unit1.Unit) && !Database.SpecialUnits.Contains(Unit2.Unit))
+                ||
+                (Database.SpecialUnits.Contains(Unit2.Unit) && !Database.SpecialUnits.Contains(Unit1.Unit))
+            )
+        )
+        {
+            if (Unit1SI == 0) //Division by 0
+            {
+                return Result("∞", true);
+            }
+            Conversion = (1 / (Unit1SI * Unit2SI)).Round(SignificantFigures);
+        }
+        else
+        {
+            Conversion = (Unit1SI / Unit2SI).Round(SignificantFigures);
+        }
+        if (Conversion != 1 && Unit2.Plurals.Count > 0) //Use plural forms if any
+        {
+            return Result(Conversion.ToFormattedString(SmallMagnitude, LargeMagnitude), true);
+        }
+        else
+        {
+            return Result(Conversion.ToFormattedString(SmallMagnitude, LargeMagnitude));
+        }
+    }
+    /// <summary>
+    /// Calculate conversions.
+    /// </summary>
+    public static void Conversions()
+    {
+        Calculate.Results.Clear();
         //Convert mode
-        else if (QueryType == "CONVERT")
+        if (Calculate.QueryType == "CONVERT")
         {
             //Track units added
             HashSet<string> UnitsAdded = new HashSet<string>();
-            for (int i = 0; i < Unit2BestMatches.Count; i++)
+            for (int i = 0; i < Calculate.Unit2BestMatches.Count; i++)
             {
                 //Prevent adding duplicates due to different alternate names
-                if (UnitsAdded.Contains(Database.UnitList[Unit2BestMatches[i]]))
+                if (UnitsAdded.Contains(Database.UnitList[Calculate.Unit2BestMatches[i]]))
                 {
                     continue;
                 }
-                Entry Item = Database.UnitCache[Unit1.Type][Database.UnitList[Unit2BestMatches[i]]];
-                //Only show conversion to same unit if same as unit 2
-                if (Item.Unit == Unit1.Unit && Item.Unit != Unit2.Unit)
+                UnitEntry Item = Database.UnitCache[Unit1.Type][Database.UnitList[Calculate.Unit2BestMatches[i]]];
+                //Only show conversion to same unit on user query
+                if (Item.Unit == Calculate.Unit1.Unit && Item.Unit != Calculate.Unit2.Unit)
                 {
                     continue;
                 }
-                //Get unit 2 SI equivalent
-                if (Database.InexactValues.ContainsKey(Item.Unit))
-                {
-                    Unit2SI = Database.InexactValues[Item.Unit];
-                }
-                else
-                {
-                    Unit2SI = Item.SI;
-                }
-                //Conversions
-                if (
-                    Unit1.Type == "Temperature"
-                    &&
-                    Database.SpecialUnits.Contains(Unit1.Unit)
-                    &&
-                    Database.SpecialUnits.Contains(Item.Unit)
-                )
-                {
-                    Conversion = Calculate.Temperature(Magnitude, Unit1.Unit, Item.Unit).Round(SignificantFigures);
-                }
-                else if (
-                (Unit1.Type == "Speed,Velocity" || Unit1.Type == "Fuel Efficiency")
-                &&
-                (
-                (Database.SpecialUnits.Contains(Unit1.Unit) && !Database.SpecialUnits.Contains(Item.Unit))
-                ||
-                (Database.SpecialUnits.Contains(Item.Unit) && !Database.SpecialUnits.Contains(Unit1.Unit))
-                    )
-                )
-                {
-                    Conversion = (1 / Unit1SI / Unit2SI).Round(SignificantFigures);
-                }
-                else
-                {
-                    Conversion = (Unit1SI / Unit2SI).Round(SignificantFigures);
-                }
-                //Add converted result to list
-                if (Conversion != 1 && Item.Plurals.Count > 0) //Use plural forms if any
-                {
-                    ConversionString = $"{Conversion.ToFormattedString(SmallMagnitude, LargeMagnitude)} {Search.BestPlural(Item.Unit, Item.Plurals)}";
-                }
-                else
-                {
-                    ConversionString = $"{Conversion.ToFormattedString(SmallMagnitude, LargeMagnitude)} {Item.Unit}";
-                }
-                Results.Add(ConversionString);
+                Calculate.Results.Add(Convert(Magnitude, Calculate.Unit1, Item));
                 //Track unit added
                 UnitsAdded.Add(Item.Unit);
             }
@@ -1450,57 +1725,13 @@ public static class Calculate
         //Convert to all
         else
         {
-            foreach (KeyValuePair<string, Entry> x in Database.UnitCache[Unit1.Type])
+            foreach ((string Name, UnitEntry Unit) in Database.UnitCache[Unit1.Type])
             {
-                if (Unit1.Unit != x.Key)
+                if (Calculate.Unit1.Unit == Name)
                 {
-                    //Get unit 2 SI equivalent
-                    if (Database.InexactValues.ContainsKey(x.Key))
-                    {
-                        Unit2SI = Database.InexactValues[x.Key];
-                    }
-                    else
-                    {
-                        Unit2SI = x.Value.SI;
-                    }
-                    //Conversions
-                    if (
-                        Unit1.Type == "Temperature"
-                        &&
-                        Database.SpecialUnits.Contains(Unit1.Unit)
-                        &&
-                        Database.SpecialUnits.Contains(x.Key)
-                    )
-                    {
-                        Conversion = Calculate.Temperature(Magnitude, Unit1.Unit, x.Key).Round(SignificantFigures);
-                    }
-                    else if (
-                        (Unit1.Type == "Speed,Velocity" || Unit1.Type == "Fuel Efficiency")
-                        &&
-                        (
-                            (Database.SpecialUnits.Contains(Unit1.Unit) && !Database.SpecialUnits.Contains(x.Key))
-                            ||
-                            (Database.SpecialUnits.Contains(x.Key) && !Database.SpecialUnits.Contains(Unit1.Unit))
-                        )
-                    )
-                    {
-                        Conversion = (1 / Unit1SI / Unit2SI).Round(SignificantFigures);
-                    }
-                    else
-                    {
-                        Conversion = (Unit1SI / Unit2SI).Round(SignificantFigures);
-                    }
-                    //Add converted result to list
-                    if (Conversion != 1 && x.Value.Plurals.Count > 0) //Use plural forms if any
-                    {
-                        ConversionString = $"{Conversion.ToFormattedString(SmallMagnitude, LargeMagnitude)} {Search.BestPlural(x.Key, x.Value.Plurals)}";
-                    }
-                    else
-                    {
-                        ConversionString = $"{Conversion.ToFormattedString(SmallMagnitude, LargeMagnitude)} {x.Key}";
-                    }
-                    Results.Add(ConversionString);
+                    continue;
                 }
+                Calculate.Results.Add(Convert(Magnitude, Calculate.Unit1, Unit));
             }
         }
     }
@@ -1511,16 +1742,12 @@ public static class Calculate
     /// -1 if <paramref name="x"/> precedes <paramref name="y"/>, 0 if <paramref name="x"/> and <paramref name="y"/>
     /// are in the same position and 1 if <paramref name="x"/> comes after <paramref name="y"/>.
     /// </returns>
-    private static int ResultsCompare(string x, string y, string SortBy, string SortOrder)
+    private static int ResultsCompare(Tuple<string,string> x, Tuple<string, string> y, string SortBy, string SortOrder)
     {
-        int FirstNonDigit1 = Search.FirstNonDigitIndex(x, BigDecimal.Separators);
-        int FirstNonDigit2 = Search.FirstNonDigitIndex(y, BigDecimal.Separators);
         //Sort by unit
         if (SortBy == "UNIT")
         {
-            x = x.Substring(FirstNonDigit1, x.Length - FirstNonDigit1).Trim();
-            y = y.Substring(FirstNonDigit2, y.Length - FirstNonDigit2).Trim();
-            int Order = string.Compare(x, y);
+            int Order = string.Compare(x.Item2, y.Item2);
             if (SortOrder == "ASCENDING")
             {
                 return Order;
@@ -1533,15 +1760,13 @@ public static class Calculate
         //Sort by magnitude
         else if (SortBy == "MAGNITUDE")
         {
-            x = x.Substring(0, FirstNonDigit1).Trim();
-            y = y.Substring(0, FirstNonDigit2).Trim();
             int Order = BigDecimal.ReverseFormat(
-                            x,
+                            x.Item1,
                             BigDecimal.DecimalSeparator,
                             BigDecimal.IntegerGroupSeparator,
                             BigDecimal.DecimalGroupSeparator
                         ).CompareTo(BigDecimal.ReverseFormat(
-                            y,
+                            y.Item1,
                             BigDecimal.DecimalSeparator,
                             BigDecimal.IntegerGroupSeparator,
                             BigDecimal.DecimalGroupSeparator

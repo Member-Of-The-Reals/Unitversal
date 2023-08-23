@@ -11,8 +11,14 @@ public partial class MainWindow : Form
         InitializeComponent();
         //Redraw when resized to avoid visual artifacts
         SetStyle(ControlStyles.ResizeRedraw, true);
-        //Add autosizing column to search view width
+        //Add autosizing width columns to list views
         SearchView.Columns.Add("Result", -1, HorizontalAlignment.Center);
+        AllView.Columns.Add("Result", -1, HorizontalAlignment.Center);
+        CategoryView.Columns.Add("Result", -1, HorizontalAlignment.Center);
+        BinaryView.Columns.Add("Result", -1, HorizontalAlignment.Center);
+        SIView.Columns.Add("Result", -1, HorizontalAlignment.Center);
+        EquivalentsView.Columns.Add("Result", -1, HorizontalAlignment.Center);
+        TemperatureView.Columns.Add("Result", -1, HorizontalAlignment.Center);
         //Change renderer for right click and sort menu
         RightClickMenu.Renderer = new ContextMenuRenderer();
         SortMenu.Renderer = new ContextMenuRenderer();
@@ -33,18 +39,34 @@ public partial class MainWindow : Form
             ChangeTheme("SYSTEM");
         }
         int DatabaseStatus = Database.Check(AppState.DatabasePath);
-        if (DatabaseStatus == 1)
+        if (DatabaseStatus == 0)
         {
-            Database.GetUnits(AppState.DatabasePath);
-            Database.CalculateInexactValues();
-        }
-        else if (DatabaseStatus == 0)
-        {
-            MessageBox.Show("Unable to find the units database! Please redownload the database, make sure it is placed in the same directory as the app, then restart.", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(
+                "Unable to find the units database! Please redownload the database, make sure it is placed in the same directory as the app, then restart.",
+                "Database Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error
+            );
         }
         else
         {
-            MessageBox.Show("The units database is corrupted! Please redownload the database, make sure it is placed in the same directory as the app, then restart.", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (DatabaseStatus == -1)
+            {
+                MessageBox.Show(
+                    "The units database is corrupted! Please redownload the database, make sure it is placed in the same directory as the app, then restart.",
+                    "Database Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error
+                );
+            }
+            //Fault tolerance; enable as many features regardless of database corruption
+            Database.GetAllUnits(AppState.DatabasePath);
+            Database.GetBinaryPrefixes(AppState.DatabasePath);
+            Database.GetCaseSensitive(AppState.DatabasePath);
+            Database.GetCurrencyAliases(AppState.DatabasePath);
+            Database.GetSIEquivalents(AppState.DatabasePath);
+            Database.GetSIPrefixes(AppState.DatabasePath);
+            Database.GetSpecialUnits(AppState.DatabasePath);
+            Database.GetTemperatureFormulas(AppState.DatabasePath);
+            Database.CalculateInexactValues();
         }
         if (Settings.UpdateCurrencies)
         {
@@ -173,44 +195,75 @@ public partial class MainWindow : Form
     }
     private void MainWindow_Resize(object sender, EventArgs e)
     {
-        //Prevent resizing outside taskbar
-        MaximizedBounds = Screen.GetWorkingArea(this);
-        //If window state changed
-        if (WindowState == FormWindowState.Maximized && !Settings.Maximized)
+        if (WindowState != FormWindowState.Minimized)
         {
-            //Change button symbol
-            MaximizeButton.Text = "";
-            //Resize title bar
-            TitleBar.Width = Width + 2;
-            TitleBar.Location = new Point(0, 0);
-            //Disable resize from edge or corner of window
-            AppState.Resize = false;
-            Settings.Maximized = true;
+            //Prevent resizing outside taskbar
+            MaximizedBounds = Screen.GetWorkingArea(this);
+            //If window state changed
+            if (WindowState == FormWindowState.Maximized && !Settings.Maximized)
+            {
+                //Change button symbol
+                MaximizeButton.Text = "";
+                //Resize title bar
+                TitleBar.Width = Width + 2;
+                TitleBar.Location = new Point(0, 0);
+                //Disable resize from edge or corner of window
+                AppState.Resize = false;
+                Settings.Maximized = true;
+            }
+            else if (WindowState == FormWindowState.Normal && Settings.Maximized)
+            {
+                //Change button symbol
+                MaximizeButton.Text = "";
+                //Resize title bar
+                TitleBar.Width = Width - 2;
+                TitleBar.Location = new Point(1, 1);
+                //Allow resize from edge or corner of window
+                AppState.Resize = true;
+                Settings.Maximized = false;
+            }
+            //Resize interpret label
+            if (SearchView.Items.Count > 0)
+            {
+                SetLabel(InterpretLabel, SortButton.Location.X - InterpretLabel.Location.X, AppState.Interpretation);
+            }
+            //Resize explorer label
+            if (AppState.Explore)
+            {
+                SetLabel(ExplorerLabel, ExploreSort.Location.X - ExplorerLabel.Location.X, AppState.CurrentView);
+            }
+            //Resize column width to fit longest item
+            if (SearchView.Columns.Count > 0)
+            {
+                SearchView.Columns[0].Width = -1;
+            }
+            if (AllView.Columns.Count > 0)
+            {
+                AllView.Columns[0].Width = -1;
+            }
+            if (CategoryView.Columns.Count > 0)
+            {
+                CategoryView.Columns[0].Width = -1;
+            }
+            if (BinaryView.Columns.Count > 0)
+            {
+                BinaryView.Columns[0].Width = -1;
+            }
+            if (SIView.Columns.Count > 0)
+            {
+                SIView.Columns[0].Width = -1;
+            }
+            if (EquivalentsView.Columns.Count > 0)
+            {
+                EquivalentsView.Columns[0].Width = -1;
+            }
+            if (TemperatureView.Columns.Count > 0)
+            {
+                TemperatureView.Columns[0].Width = -1;
+            }
+            ScrollTextContents(true);
+            Settings.WindowSize = Size;
         }
-        else if (WindowState == FormWindowState.Normal && Settings.Maximized)
-        {
-            //Change button symbol
-            MaximizeButton.Text = "";
-            //Resize title bar
-            TitleBar.Width = Width - 2;
-            TitleBar.Location = new Point(1, 1);
-            //Allow resize from edge or corner of window
-            AppState.Resize = true;
-            Settings.Maximized = false;
-        }
-        //Resize intepret label
-        InterpretLabel.MaximumSize = new Size(SortButton.Location.X - InterpretLabel.Location.X, 15);
-        if (SearchView.Items.Count > 0 && WindowState != FormWindowState.Minimized)
-        {
-            InterpretLabel.Text = TruncateInterpretation(AppState.Interpretation);
-        }
-        //Resize column width to fit longest item
-        if (SearchView.Columns.Count > 0)
-        {
-            SearchView.Columns[0].Width = -1;
-        }
-        ScrollTextContents(true);
-        Settings.WindowSize = Size;
     }
     private void MainWindow_LocationChanged(object sender, EventArgs e)
     {
@@ -233,7 +286,30 @@ public partial class MainWindow : Form
     //
     private void RightClickOpen_Click(object sender, EventArgs e)
     {
-        SearchView_ItemActivate(this, EventArgs.Empty);
+        switch (AppState.RightClickLocation)
+        {
+            case "SearchView":
+                SearchView_ItemActivate(this, EventArgs.Empty);
+                break;
+            case "AllView":
+                AllView_ItemActivate(this, EventArgs.Empty);
+                break;
+            case "CategoryView":
+                CategoryView_ItemActivate(this, EventArgs.Empty);
+                break;
+            case "BinaryView":
+                BinaryView_ItemActivate(this, EventArgs.Empty);
+                break;
+            case "SIView":
+                SIView_ItemActivate(this, EventArgs.Empty);
+                break;
+            case "EquivalentsView":
+                EquivalentsView_ItemActivate(this, EventArgs.Empty);
+                break;
+            case "TemperatureView":
+                TemperatureView_ItemActivate(this, EventArgs.Empty);
+                break;
+        }
     }
     private void RightClickCut_Click(object sender, EventArgs e)
     {
@@ -241,23 +317,17 @@ public partial class MainWindow : Form
     }
     private void RightClickCopy_Click(object sender, EventArgs e)
     {
-        if (AppState.RightClickLocation == "Box")
+        switch (AppState.RightClickLocation)
         {
-            SearchBox.Copy();
-        }
-        else if (AppState.RightClickLocation == "View")
-        {
-            var CopyText = "";
-            foreach (ListViewItem x in SearchView.SelectedItems)
-            {
-                CopyText = CopyText + x.Text + "\n";
-            }
-            CopyText = CopyText.Remove(CopyText.Length - 1);
-            Clipboard.SetText(CopyText);
-        }
-        else if (AppState.RightClickLocation == "Description")
-        {
-            DescriptionText.Copy();
+            case "SearchBox":
+                SearchBox.Copy();
+                break;
+            case "DescriptionText":
+                DescriptionText.Copy();
+                break;
+            default:
+                ListViewCopy(Controls.Find(AppState.RightClickLocation, true)[0] as ListView);
+                break;
         }
     }
     private void RightClickPaste_Click(object sender, EventArgs e)
@@ -267,22 +337,19 @@ public partial class MainWindow : Form
     }
     private void RightClickSelectAll_Click(object sender, EventArgs e)
     {
-        if (AppState.RightClickLocation == "Box")
+        switch (AppState.RightClickLocation)
         {
-            SearchBox.SelectAll();
-            SearchBox.Focus();
-        }
-        else if (AppState.RightClickLocation == "View")
-        {
-            foreach (ListViewItem item in SearchView.Items)
-            {
-                item.Selected = true;
-            }
-        }
-        else if (AppState.RightClickLocation == "Description")
-        {
-            DescriptionText.SelectAll();
-            DescriptionText.Focus();
+            case "SearchBox":
+                SearchBox.SelectAll();
+                SearchBox.Focus();
+                break;
+            case "DescriptionText":
+                DescriptionText.SelectAll();
+                DescriptionText.Focus();
+                break;
+            default:
+                ListViewSelectAll(Controls.Find(AppState.RightClickLocation, true)[0] as ListView);
+                break;
         }
     }
     //
@@ -294,7 +361,7 @@ public partial class MainWindow : Form
         if (e.Button == MouseButtons.Right)
         {
             //Set click location
-            AppState.RightClickLocation = "Box";
+            AppState.RightClickLocation = "SearchBox";
             //Open is removed for search box
             RightClickOpen.Visible = false;
             //Cut is added for search box
@@ -333,74 +400,78 @@ public partial class MainWindow : Form
         if (SearchBox.Text.Length > 0)
         {
             ClearSearchButton.Visible = true;
+            SearchBox.PadSize = 25; //Prevent clear button from blocking text
+            SearchBox.SetMargin();
         }
         else
         {
             ClearSearchButton.Visible = false;
+            SearchBox.PadSize = 0;
+            SearchBox.SetMargin();
         }
-        AppState.Recognized = false; //Reset tracker
+        AppState.Recognized = false;
         ScrollTextContents(false);
-        //Current query without leading and trailing space
         string CurrentQuery = SearchBox.Text.Trim();
-        //Return if query is same as previous to reduce redundant processing
-        //Checking if explore false prevents inescapable explore mode when user inputs leading or trailing spaces
-        if (AppState.Explore == false && CurrentQuery.Equals(PreviousState.Query))
-        {
-            return;
-        }
-        else if (CurrentQuery.Length == 0)
+        if (CurrentQuery.Length == 0)
         {
             ClearSearchView();
-            PreviousState.Query = "";
             return;
         }
-        //Explore mode
-        else if (
-            CurrentQuery.Equals("EXPLORE", StringComparison.OrdinalIgnoreCase)
-            ||
-            (!"0123456789".Contains(CurrentQuery[0]) && Search.LongestSubstring(CurrentQuery.ToUpper(), "EXPLORE") > 3)
-        )
+        else if (CurrentQuery.Equals("ABOUT", StringComparison.OrdinalIgnoreCase))
         {
+            SearchBox.Clear();
+            AboutButton_Click(this, EventArgs.Empty);
+            return;
+        }
+        else if (CurrentQuery.Equals("EXPLORE", StringComparison.OrdinalIgnoreCase))
+        {
+            SearchBox.Clear();
             ExploreButton_Click(this, EventArgs.Empty);
-            PreviousState.Query = CurrentQuery;
+            return;
+        }
+        else if (CurrentQuery.Equals("SETTINGS", StringComparison.OrdinalIgnoreCase))
+        {
+            SearchBox.Clear();
+            SettingsButton_Click(this, EventArgs.Empty);
             return;
         }
         else
         {
-            PreviousState.Query = CurrentQuery;
             string Unit1 = "";
             string Unit2 = "";
-            string[] TokenizedQuery = CurrentQuery.Split(" ");
-            //Remove integer and decimal group separators
-            TokenizedQuery[0] = TokenizedQuery[0].Replace(Settings.IntegerGroupSeparator, "");
-            TokenizedQuery[0] = TokenizedQuery[0].Replace(Settings.DecimalGroupSeparator, "");
+            int UnitsIndex = Search.UnitNameIndex(CurrentQuery, BigDecimal.Separators);
+            UnitsIndex = UnitsIndex == -1 ? 0 : UnitsIndex;
+            string Magnitude = CurrentQuery.Substring(0, UnitsIndex).Trim();
+            string[] TokenizedQuery = CurrentQuery.Substring(UnitsIndex).Split(" ");
+            //Remove integer and decimal group separators from magnitude
+            Magnitude = Magnitude.Replace(Settings.IntegerGroupSeparator, "");
+            Magnitude = Magnitude.Replace(Settings.DecimalGroupSeparator, "");
             //Check for and get valid magnitude
-            if (BigDecimal.TryParse(TokenizedQuery[0], out Calculate.Magnitude, char.Parse(Settings.DecimalSeparator)))
+            if (BigDecimal.TryParse(Magnitude, out Calculate.Magnitude, char.Parse(Settings.DecimalSeparator)))
             {
-                //Checking for "to" string
-                int ToIndex = Array.FindIndex(TokenizedQuery, x => x.Equals("to", StringComparison.OrdinalIgnoreCase));
-                //Get units from query
+                int ToIndex = -1;
+                //Find all "to" strings
+                List<int> ToStrings = new List<int>();
                 for (int i = 1; i < TokenizedQuery.Length; i++)
                 {
-                    //If "to" present, get both units
-                    if (ToIndex != -1)
+                    if (i != ToIndex && TokenizedQuery[i].Equals("to", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (i < ToIndex)
-                        {
-                            Unit1 += $" {TokenizedQuery[i]}";
-                        }
-                        else if (i > ToIndex)
-                        {
-                            Unit2 += $" {TokenizedQuery[i]}";
-                        }
-                    }
-                    //If "to" not present, get first unit
-                    else
-                    {
-                        Unit1 += $" {TokenizedQuery[i]}";
+                        ToIndex = i;
+                        ToStrings.Add(i);
                     }
                 }
-                //Remove leading and trailing spaces
+                //Get middle "to" string
+                ToIndex = ToStrings.Count == 0 ? -1 : ToStrings[ToStrings.Count / 2];
+                //Get units from query
+                if (ToIndex != -1)
+                {
+                    Unit1 = string.Join(" ", TokenizedQuery, 0, ToIndex);
+                    Unit2 = string.Join(" ", TokenizedQuery, ToIndex + 1, TokenizedQuery.Length - ToIndex - 1);
+                }
+                else
+                {
+                    Unit1 = string.Join(" ", TokenizedQuery);
+                }
                 Unit1 = Unit1.Trim();
                 Unit2 = Unit2.Trim();
                 if (Unit1 != "")
@@ -424,53 +495,16 @@ public partial class MainWindow : Form
                     if (Calculate.Unit1BestMatches.Count > 0)
                     {
                         Calculate.Unit1 = Database.GetUnitFromCache(Database.UnitList[Calculate.Unit1BestMatches[0]]);
-                        Calculate.Unit1BestMatches.RemoveRange(1, Calculate.Unit1BestMatches.Count - 1); //Only the best match matters for unit 1
                         AppState.Recognized = true;
                     }
                     //Check unit 2 recognition
-                    if (Calculate.QueryType == "CONVERT")
+                    if (Calculate.QueryType == "CONVERT" && AppState.Recognized)
                     {
                         //Get best matches of unit 2
-                        Calculate.Unit2BestMatches = Search.BestMatches(Unit2);
+                        Calculate.Unit2BestMatches = Search.BestMatches(Unit2, Calculate.Unit1.Type);
                         if (Calculate.Unit2BestMatches.Count > 0)
                         {
-                            //For error message in case unit 1 and 2 are not compatible
-                            string IncompatibleMatch = Calculate.Unit2BestMatches[0];
-                            Entry IncompatibleUnit = Database.GetUnitFromCache(Database.UnitList[IncompatibleMatch]);
-                            //Remove units of different type than best match
-                            Calculate.Unit2BestMatches.RemoveAll(x => !Database.UnitCache[Calculate.Unit1.Type].ContainsKey(Database.UnitList[x]));
-                            if (Calculate.Unit2BestMatches.Count > 0)
-                            {
-                                Calculate.Unit2 = Database.GetUnitFromCache(Database.UnitList[Calculate.Unit2BestMatches[0]]);
-                                //Determine recognition for unit 1 and 2
-                                AppState.Recognized = AppState.Recognized == false ? false : true;
-                            }
-                            else
-                            {
-                                //Incompatible types error interpretation text
-                                ClearSearchView(); //Also clears interpret text
-                                AppState.Interpretation = $"Cannot Convert {Calculate.Unit1.Type} to {IncompatibleUnit.Type} (";
-                                //Unit 1
-                                if (Calculate.Unit1.Symbols.Contains(Calculate.Unit1BestMatches[0]) || Calculate.Unit1.Abbreviations.Contains(Calculate.Unit1BestMatches[0]))
-                                {
-                                    AppState.Interpretation += $"{Calculate.Unit1.Unit} ({Calculate.Unit1BestMatches[0]}) to ";
-                                }
-                                else
-                                {
-                                    AppState.Interpretation += $"{Calculate.Unit1BestMatches[0]} to ";
-                                }
-                                //Incompatible unit
-                                if (IncompatibleUnit.Symbols.Contains(IncompatibleMatch) || IncompatibleUnit.Abbreviations.Contains(IncompatibleMatch))
-                                {
-                                    AppState.Interpretation += $"{IncompatibleUnit.Unit} ({IncompatibleMatch}))";
-                                }
-                                else
-                                {
-                                    AppState.Interpretation += $"{IncompatibleMatch})";
-                                }
-                                InterpretLabel.Text = TruncateInterpretation(AppState.Interpretation);
-                                return;
-                            }
+                            Calculate.Unit2 = Database.GetUnitFromCache(Database.UnitList[Calculate.Unit2BestMatches[0]]);
                         }
                         else
                         {
@@ -483,10 +517,7 @@ public partial class MainWindow : Form
             else
             {
                 //Get unit from query
-                for (int i = 0; i < TokenizedQuery.Length; i++)
-                {
-                    Unit1 += $" {TokenizedQuery[i]}";
-                }
+                Unit1 = string.Join(" ", TokenizedQuery);
                 Unit1 = Unit1.Trim();
                 //Set info mode
                 Calculate.QueryType = "INFO";
@@ -522,18 +553,19 @@ public partial class MainWindow : Form
                 ||
                 Calculate.QueryType != PreviousState.QueryType
                 ||
-                AppState.Explore == true
+                AppState.Explore //Breaks out of explore
             )
             {
                 PreviousState.Magnitude = Calculate.Magnitude;
                 PreviousState.Unit1BestMatches = new List<string>(Calculate.Unit1BestMatches);
                 PreviousState.Unit2BestMatches = new List<string>(Calculate.Unit2BestMatches);
                 PreviousState.QueryType = Calculate.QueryType;
-                GetAddResults();
+                UpdateResults();
             }
+            //Display new alternate name matches if any
             else
             {
-                UpdateInterpretation(); //Display new alternate name matches if any
+                UpdateInterpretation();
             }
         }
         else
@@ -549,11 +581,7 @@ public partial class MainWindow : Form
     {
         if (!AppState.Explore)
         {
-            if (InterpretLabel.Text.Contains("Interpretation"))
-            {
-                AppState.InterpretInfo = true;
-                SearchView_ItemActivate(this, EventArgs.Empty);
-            }
+            ShowUnitInfo(Calculate.Unit1.Unit);
         }
     }
     //Flat tooltip style
@@ -616,6 +644,10 @@ public partial class MainWindow : Form
         if (!AppState.SortShown)
         {
             AppState.SortShown = true;
+            //Following items are disabled for explorer sort
+            SortSeparator.Visible = true;
+            SortUnit.Visible = true;
+            SortMagnitude.Visible = true;
             SortMenu.Show(SortButton.PointToScreen(new Point(0, SortButton.Height)));
         }
         //Hide sort menu if shown
@@ -628,11 +660,16 @@ public partial class MainWindow : Form
     private void SortMenu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
     {
         //Check if button was pressed when menu closed
-        bool ButtonClicked = SortButton.ClientRectangle.Contains(SortButton.PointToClient(Cursor.Position));
+        bool SortButtonClicked = SortButton.ClientRectangle.Contains(SortButton.PointToClient(Cursor.Position));
+        bool ExploreButtonClicked = ExploreSort.ClientRectangle.Contains(ExploreSort.PointToClient(Cursor.Position));
         //Set sort shown to false if sort menu closed without button
-        if (!ButtonClicked)
+        if (!SortButtonClicked)
         {
             AppState.SortShown = false;
+        }
+        if (!ExploreButtonClicked)
+        {
+            AppState.ExploreSortShown = false;
         }
     }
     private void SortAscending_Click(object sender, EventArgs e)
@@ -651,7 +688,11 @@ public partial class MainWindow : Form
             SortAscending.Checked = true;
         }
         //Sort results
-        if (SearchView.Items.Count > 0 && Settings.SortOrder != PreviousState.SortOrder)
+        if (AppState.Explore)
+        {
+            LoadExplorer();
+        }
+        else if (SearchView.Items.Count > 0 && Settings.SortOrder != PreviousState.SortOrder)
         {
             SortResults();
         }
@@ -674,7 +715,11 @@ public partial class MainWindow : Form
             SortDescending.Checked = true;
         }
         //Sort results
-        if (SearchView.Items.Count > 0 && Settings.SortOrder != PreviousState.SortOrder)
+        if (AppState.Explore)
+        {
+            LoadExplorer();
+        }
+        else if (SearchView.Items.Count > 0 && Settings.SortOrder != PreviousState.SortOrder)
         {
             SortResults();
         }
@@ -730,10 +775,10 @@ public partial class MainWindow : Form
     //
     //————————————————————Search View————————————————————
     //
-    //Search view minimum size
+    //Search view minimum column width
     private void SearchView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
     {
-        //-19 adjustment prevents horizontal scrollbar from appearing
+        //-19 adjustment prevents horizontal scrollbar from appearing and accounts for width of vertical scrollbar
         if (SearchView.Columns[0].Width < SearchView.Width - 19)
         {
             SearchView.Columns[0].Width = SearchView.Width - 19;
@@ -745,35 +790,74 @@ public partial class MainWindow : Form
         if (e.Button == MouseButtons.Right)
         {
             //Track click location
-            AppState.RightClickLocation = "View";
-            //Open is added for search view
+            AppState.RightClickLocation = "SearchView";
+            //Open is added for list view
             RightClickOpen.Visible = true;
-            //Cut is removed for search view
+            //Cut is removed for list view
             RightClickCut.Visible = false;
-            //Paste is removed for search view
+            //Paste is removed for list view
             RightClickPaste.Visible = false;
-            //Enable or disable cut or copy depending on selection
+            //Enable or disable open and copy depending on selection
             if (SearchView.SelectedItems.Count > 0)
             {
                 RightClickOpen.Enabled = true;
-                RightClickCut.Enabled = true;
                 RightClickCopy.Enabled = true;
             }
             else
             {
                 RightClickOpen.Enabled = false;
-                RightClickCut.Enabled = false;
                 RightClickCopy.Enabled = false;
             }
         }
     }
+    //Search view key binds
+    private void SearchView_KeyDown(object sender, KeyEventArgs e)
+    {
+        string KeysPressed = e.KeyData.ToString();
+        if (KeysPressed == "C, Control")
+        {
+            ListViewCopy(SearchView);
+        }
+        if (KeysPressed == "A, Control")
+        {
+            ListViewSelectAll(SearchView);
+        }
+    }
+    //Double click item for more information
+    private void SearchView_ItemActivate(object sender, EventArgs e)
+    {
+        string Item;
+        if (SearchView.SelectedItems.Count > 0)
+        {
+            if (Calculate.QueryType == "INFO")
+            {
+                Item = SearchView.SelectedItems[0].Text;
+            }
+            else
+            {
+                Item = Calculate.Results[SearchView.Items.IndexOf(SearchView.SelectedItems[0])].Item2;
+                Item = Database.UnitList[Item];
+            }
+            if (Database.UnitList.ContainsKey(Item))
+            {
+                ShowUnitInfo(Item);
+            }
+            else if (Database.SIPrefixes.ContainsKey(Item) || Database.BinaryPrefixes.ContainsKey(Item))
+            {
+                ShowPrefixInfo(Item);
+            }
+        }
+    }
+    //
+    //————————————————————Info Display————————————————————
+    //
     //Description text right click menu behavior
     private void DescriptionText_MouseUp(object sender, MouseEventArgs e)
     {
         if (e.Button == MouseButtons.Right)
         {
             //Track click location
-            AppState.RightClickLocation = "Description";
+            AppState.RightClickLocation = "DescriptionText";
             //Open is removed for description text
             RightClickOpen.Visible = false;
             //Cut is removed for description text
@@ -791,264 +875,35 @@ public partial class MainWindow : Form
             }
         }
     }
-    //Search view key binds
-    private void SearchView_KeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.KeyData.ToString() == "C, Control")
-        {
-            var CopyText = "";
-            foreach (ListViewItem x in SearchView.SelectedItems)
-            {
-                CopyText = CopyText + x.Text + "\n";
-            }
-            CopyText = CopyText.Remove(CopyText.Length - 1);
-            Clipboard.SetText(CopyText);
-        }
-        if (e.KeyData.ToString() == "A, Control")
-        {
-            foreach (ListViewItem item in SearchView.Items)
-            {
-                item.Selected = true;
-            }
-        }
-    }
-    //
-    //————————————————————Info Display————————————————————
-    //
-    //Double click item for more information
-    private void SearchView_ItemActivate(object sender, EventArgs e)
-    {
-        string Item;
-        //If interpretation text was clicked
-        if (AppState.InterpretInfo == true)
-        {
-            Item = Calculate.Unit1.Unit;
-            AppState.InterpretInfo = false;
-        }
-        else
-        {
-            //Check for selected items
-            if (SearchView.SelectedItems.Count > 0)
-            {
-                Item = SearchView.SelectedItems[0].SubItems[0].Text;
-                //Remove magnitude to get unit name
-                if (!AppState.Explore && Calculate.QueryType != "INFO")
-                {
-                    int FirstNonDigit = Search.FirstNonDigitIndex(Item, BigDecimal.Separators);
-                    Item = Item.Substring(FirstNonDigit, Item.Length - FirstNonDigit).Trim();
-                }
-            }
-            else
-            {
-                //If called using save button
-                if (PreviousState.SelectedUnit.Length > 0)
-                {
-                    Item = PreviousState.SelectedUnit;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
-        if (Database.UnitList.ContainsKey(Item))
-        {
-            //Check cached information to reduce slow GUI rendering
-            if (
-                Database.UnitList[Item] == PreviousState.SelectedUnit
-                &&
-                //Decimal separator needs to be updated if different
-                Settings.DecimalSeparator == PreviousState.DecimalSeparator
-            )
-            {
-                //Remove focus to keep contents at top
-                Title.Focus();
-                //Scroll contents to top
-                DescriptionText.SelectionStart = 0;
-                DescriptionText.ScrollToCaret();
-                //Show cached text
-                InfoDisplay.Visible = true;
-                InfoDisplay.BringToFront();
-            }
-            else
-            {
-                //Get unit info from cache
-                Entry Unit = Database.GetUnitFromCache(Database.UnitList[Item]);
-                //Update previously selected unit
-                PreviousState.SelectedUnit = Database.UnitList[Item];
-                //Remove focus from display to keep contents from scrolling down
-                Title.Focus();
-                //Clear textboxes
-                DescriptionText.Clear();
-                //Unit text
-                DescriptionText.AppendText("Unit");
-                DescriptionText.SelectionStart = 0;
-                DescriptionText.SelectionLength = 4;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Bold);
-                DescriptionText.SelectionStart = DescriptionText.TextLength;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
-                DescriptionText.AppendText(" ");
-                DescriptionText.AppendText(Unit.Unit);
-                DescriptionText.AppendText("\n\n");
-                int PreviousLength = DescriptionText.TextLength;
-                //Alternate names text
-                DescriptionText.AppendText("Alternate Names");
-                DescriptionText.SelectionStart = PreviousLength;
-                DescriptionText.SelectionLength = 15;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Bold);
-                DescriptionText.SelectionStart = DescriptionText.TextLength;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
-                DescriptionText.AppendText(" ");
-                List<string> AlternateNames = new List<string>(Unit.AlternateNames);
-                AlternateNames.AddRange(Unit.AmericanSpelling);
-                int IndexLength = AlternateNames.Count - 1;
-                for (int i = 0; i < AlternateNames.Count; i++)
-                {
-                    if (i == IndexLength)
-                    {
-                        DescriptionText.AppendText($"{AlternateNames[i]}");
-                    }
-                    else
-                    {
-                        DescriptionText.AppendText($"{AlternateNames[i]}, ");
-                    }
-                }
-                DescriptionText.AppendText("\n\n");
-                PreviousLength = DescriptionText.TextLength;
-                //Symbols text
-                DescriptionText.AppendText("Symbols");
-                DescriptionText.SelectionStart = PreviousLength;
-                DescriptionText.SelectionLength = 7;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Bold);
-                DescriptionText.SelectionStart = DescriptionText.TextLength;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
-                DescriptionText.AppendText(" ");
-                for (int i = 0; i < Unit.Symbols.Count; i++)
-                {
-                    if (i == Unit.Symbols.Count - 1)
-                    {
-                        DescriptionText.AppendText($"{Unit.Symbols[i]}");
-                    }
-                    else
-                    {
-                        DescriptionText.AppendText($"{Unit.Symbols[i]}, ");
-                    }
-                }
-                DescriptionText.AppendText("\n\n");
-                PreviousLength = DescriptionText.TextLength;
-                //Abbreviations text
-                DescriptionText.AppendText("Abbreviations");
-                DescriptionText.SelectionStart = PreviousLength;
-                DescriptionText.SelectionLength = 13;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Bold);
-                DescriptionText.SelectionStart = DescriptionText.TextLength;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
-                DescriptionText.AppendText(" ");
-                for (int i = 0; i < Unit.Abbreviations.Count; i++)
-                {
-                    if (i == Unit.Abbreviations.Count - 1)
-                    {
-                        DescriptionText.AppendText($"{Unit.Abbreviations[i]}");
-                    }
-                    else
-                    {
-                        DescriptionText.AppendText($"{Unit.Abbreviations[i]}, ");
-                    }
-                }
-                DescriptionText.AppendText("\n\n");
-                PreviousLength = DescriptionText.TextLength;
-                //Type text
-                DescriptionText.AppendText("Type");
-                DescriptionText.SelectionStart = PreviousLength;
-                DescriptionText.SelectionLength = 4;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Bold);
-                DescriptionText.SelectionStart = DescriptionText.TextLength;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
-                DescriptionText.AppendText(" ");
-                DescriptionText.AppendText(Unit.Type);
-                DescriptionText.AppendText("\n\n");
-                PreviousLength = DescriptionText.TextLength;
-                //SI text
-                if (Unit.Type.Equals("Currency", StringComparison.OrdinalIgnoreCase))
-                {
-                    DescriptionText.AppendText("USD Equivalent");
-                    DescriptionText.SelectionStart = PreviousLength;
-                    DescriptionText.SelectionLength = 14;
-                }
-                else
-                {
-                    DescriptionText.AppendText("SI Equivalent");
-                    DescriptionText.SelectionStart = PreviousLength;
-                    DescriptionText.SelectionLength = 13;
-                }
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Bold);
-                DescriptionText.SelectionStart = DescriptionText.TextLength;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
-                DescriptionText.AppendText(" ");
-                DescriptionText.AppendText(Unit.SI.PlainString().Replace('.', char.Parse(Settings.DecimalSeparator)));
-                PreviousState.DecimalSeparator = Settings.DecimalSeparator;
-                if (Database.InexactValues.ContainsKey(Unit.Unit))
-                {
-                    DescriptionText.AppendText("...");
-                }
-                DescriptionText.AppendText("\n\n");
-                PreviousLength = DescriptionText.TextLength;
-                //Description text
-                DescriptionText.AppendText("Description");
-                DescriptionText.SelectionStart = PreviousLength;
-                DescriptionText.SelectionLength = 11;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Bold);
-                DescriptionText.SelectionStart = DescriptionText.TextLength;
-                DescriptionText.SelectionFont = new Font(DescriptionText.Font, FontStyle.Regular);
-                DescriptionText.AppendText(" ");
-                DescriptionText.AppendText(Unit.Description);
-                //Make about display visible
-                InfoDisplay.Visible = true;
-                InfoDisplay.BringToFront();
-            }
-        }
-    }
     //Description text open clicked links
     private void DescriptionText_LinkClicked(object sender, LinkClickedEventArgs e)
     {
         System.Diagnostics.Process.Start("explorer.exe", e.LinkText);
     }
-    private void ReturnButton_Click(object sender, EventArgs e)
+    private void InfoCloseButton_Click(object sender, EventArgs e)
     {
         InfoDisplay.Visible = false;
-    }
-    private void SettingsButton_Click(object sender, EventArgs e)
-    {
-        SettingsPanel.Visible = true;
-        SettingsPanel.BringToFront();
+        if (AppState.Explore)
+        {
+            Explorer.Visible = true;
+        }
     }
     //
     //————————————————————Settings Window————————————————————
     //
+    private void SettingsButton_Click(object sender, EventArgs e)
+    {
+        SettingsPanel.Visible = true;
+        SettingsPanel.Focus();
+    }
     private void ExploreButton_Click(object sender, EventArgs e)
     {
-        CancButton_Click(this, EventArgs.Empty); //Resets unsaved settings in settings menu
-        if (Database.UnitListNoPlural.Count > 0) //In case of database issues
-        {
-            //Check if already exploring to reduce redundant processing
-            if (!AppState.Explore)
-            {
-                AppState.Explore = true;
-                SearchView.Items.Clear(); //Clear search view
-                AppState.Interpretation = "Interpretation: Explore All Units";
-                InterpretLabel.Text = TruncateInterpretation(AppState.Interpretation);
-                Database.SortUnitListNoPlural(Settings.SortOrder);
-                //BeginUpdate and EndUpdate must be called an equal number of times.
-                SearchView.BeginUpdate();
-                foreach (string x in Database.UnitListNoPlural)
-                {
-                    SearchView.Items.Add(x);
-                }
-                SearchView.EndUpdate();
-            }
-        }
-        //Close settings panel
-        SettingsPanel.Visible = false;
+        CancButton_Click(this, EventArgs.Empty);
+        AppState.Explore = true;
+        Explorer.Visible = true;
+        Explorer.Panel1.Focus();
+        AppState.CurrentView = "All Units";
+        LoadExplorer();
     }
     private void UpdateCurrencyButton_Click(object sender, EventArgs e)
     {
@@ -1064,34 +919,14 @@ public partial class MainWindow : Form
     }
     private void AboutButton_Click(object sender, EventArgs e)
     {
+        CancButton_Click(this, EventArgs.Empty);
         AboutDisplay.Visible = true;
-        AboutDisplay.BringToFront();
+        AboutDisplay.Focus();
     }
     private void SaveButton_Click(object sender, EventArgs e)
     {
-        //Decimal separator error check
-        if (DecimalSeparatorEntry.Text == "")
+        if (!SeparatorCheck())
         {
-            MessageBox.Show("Decimal separator cannot be empty.", "Invalid Separator", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            DecimalSeparatorEntry.Text = Settings.DecimalSeparator;
-            return;
-        }
-        else if (int.TryParse(DecimalSeparatorEntry.Text, out _))
-        {
-            MessageBox.Show("Decimal separator cannot be a numeral.", "Invalid Separator", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            DecimalSeparatorEntry.Text = Settings.DecimalSeparator;
-            return;
-        }
-        else if (DecimalSeparatorEntry.Text == IntegerGroupSeparatorEntry.Text)
-        {
-            MessageBox.Show("Decimal separator cannot be the same as the integer grouping separator.", "Invalid Separator", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            DecimalSeparatorEntry.Text = Settings.DecimalSeparator;
-            return;
-        }
-        else if (DecimalSeparatorEntry.Text == DecimalGroupSeparatorEntry.Text)
-        {
-            MessageBox.Show("Decimal separator cannot be the same as the decimal grouping separator.", "Invalid Separator", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            DecimalSeparatorEntry.Text = Settings.DecimalSeparator;
             return;
         }
         //Hide settings panel
@@ -1132,12 +967,7 @@ public partial class MainWindow : Form
         //Update search view
         if (SearchView.Items.Count > 0)
         {
-            GetAddResults();
-        }
-        //Update info display
-        if (InfoDisplay.Visible)
-        {
-            SearchView_ItemActivate(this, EventArgs.Empty);
+            UpdateResults();
         }
     }
     private void CancButton_Click(object sender, EventArgs e)
@@ -1195,8 +1025,475 @@ public partial class MainWindow : Form
     {
         ChangelogTextBox.BringToFront();
     }
-    private void AboutReturnButton_Click(object sender, EventArgs e)
+    private void AboutCloseButton_Click(object sender, EventArgs e)
     {
         AboutDisplay.Visible = false;
+    }
+    //
+    //————————————————————Explorer————————————————————
+    //
+    private void ExploreMenuButton_Click(object sender, EventArgs e)
+    {
+        if (Explorer.SplitterDistance != 30)
+        {
+            Explorer.SplitterDistance = 30;
+            AllButton.Visible = false;
+            CategoryButton.Visible = false;
+            BinaryButton.Visible = false;
+            SIButton.Visible = false;
+            EquivalentsButton.Visible = false;
+            TemperatureButton.Visible = false;
+            BackButton.Visible = false;
+            ExitButton.Visible = false;
+        }
+        else
+        {
+            Explorer.SplitterDistance = 150;
+            AllButton.Visible = true;
+            CategoryButton.Visible = true;
+            BinaryButton.Visible = true;
+            SIButton.Visible = true;
+            EquivalentsButton.Visible = true;
+            TemperatureButton.Visible = true;
+            ExitButton.Visible = true;
+            if (
+                (AppState.SecondMenu != "" && Explorer.Panel2.Controls.GetChildIndex(CategoryView) == 0)
+                ||
+                (AppState.FirstUnit != "" && Explorer.Panel2.Controls.GetChildIndex(TemperatureView) == 0)
+            )
+            {
+                BackButton.Visible = true;
+            }
+        }
+        //Resize column width to fit longest item
+        foreach (ListView View in new ListView[] { AllView, CategoryView, BinaryView, SIView, EquivalentsView, TemperatureView })
+        {
+            View.BeginUpdate();
+            View.Columns[0].Width = -1;
+            View.EndUpdate();
+        }
+        SetLabel(ExplorerLabel, ExploreSort.Location.X - ExplorerLabel.Location.X, AppState.CurrentView);
+    }
+    private void AllButton_Click(object sender, EventArgs e)
+    {
+        AllView.BringToFront();
+        ExplorerLabel.Text = "All Units";
+        AppState.CurrentView = ExplorerLabel.Text;
+        BackButton.Visible = false;
+    }
+    private void CategoryButton_Click(object sender, EventArgs e)
+    {
+        CategoryView.BringToFront();
+        AppState.CurrentView = AppState.SecondMenu == "" ? "Units By Category" : $"{AppState.SecondMenu} Units";
+        SetLabel(ExplorerLabel, ExploreSort.Location.X - ExplorerLabel.Location.X, AppState.CurrentView);
+        if (AppState.SecondMenu != "" && Explorer.Panel2.Controls.GetChildIndex(CategoryView) == 0)
+        {
+            BackButton.Visible = true;
+            return;
+        }
+        BackButton.Visible = false;
+    }
+    private void BinaryButton_Click(object sender, EventArgs e)
+    {
+        BinaryView.BringToFront();
+        ExplorerLabel.Text = "Binary Prefixes";
+        AppState.CurrentView = ExplorerLabel.Text;
+        BackButton.Visible = false;
+    }
+    private void SIButton_Click(object sender, EventArgs e)
+    {
+        SIView.BringToFront();
+        ExplorerLabel.Text = "SI Prefixes";
+        AppState.CurrentView = ExplorerLabel.Text;
+        BackButton.Visible = false;
+    }
+    private void EquivalentsButton_Click(object sender, EventArgs e)
+    {
+        EquivalentsView.BringToFront();
+        ExplorerLabel.Text = "SI Equivalents";
+        AppState.CurrentView = ExplorerLabel.Text;
+        BackButton.Visible = false;
+    }
+    private void TemperatureButton_Click(object sender, EventArgs e)
+    {
+        TemperatureView.BringToFront();
+        ExplorerLabel.Text = AppState.FirstUnit == "" ? "Temperature Formulas" : $"{AppState.FirstUnit} Formulas";
+        AppState.CurrentView = ExplorerLabel.Text;
+        if (AppState.FirstUnit != "" && Explorer.Panel2.Controls.GetChildIndex(TemperatureView) == 0)
+        {
+            BackButton.Visible = true;
+            return;
+        }
+        BackButton.Visible = false;
+    }
+    private void BackButton_Click(object sender, EventArgs e)
+    {
+        if (Explorer.Panel2.Controls.GetChildIndex(CategoryView) == 0)
+        {
+            AppState.SecondMenu = "";
+            ExplorerLabel.Text = "Units By Category";
+        }
+        else if (Explorer.Panel2.Controls.GetChildIndex(TemperatureView) == 0)
+        {
+            AppState.FirstUnit = "";
+            ExplorerLabel.Text = "Temperature Formulas";
+        }
+        AppState.CurrentView = ExplorerLabel.Text;
+        LoadExplorer();
+        PreviousState.SecondMenu = AppState.SecondMenu;
+        PreviousState.FirstUnit = AppState.FirstUnit;
+        BackButton.Visible = false;
+    }
+    private void ExitButton_Click(object sender, EventArgs e)
+    {
+        Explorer.Visible = false;
+        AppState.Explore = false;
+    }
+    //Sort button
+    private void ExploreSort_Click(object sender, EventArgs e)
+    {
+        //Show sort menu if not shown
+        if (!AppState.ExploreSortShown)
+        {
+            AppState.ExploreSortShown = true;
+            SortSeparator.Visible = false;
+            SortUnit.Visible = false;
+            SortMagnitude.Visible = false;
+            SortMenu.Show(ExploreSort.PointToScreen(new Point(0, ExploreSort.Height)));
+        }
+        //Hide sort menu if shown
+        else
+        {
+            AppState.ExploreSortShown = false;
+            SortMenu.Hide();
+        }
+    }
+    //Minimum column width for list views
+    private void AllView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+    {
+        //-19 adjustment prevents horizontal scrollbar from appearing and accounts for width of vertical scrollbar
+        if (AllView.Columns[0].Width < AllView.Width - 19)
+        {
+            AllView.Columns[0].Width = AllView.Width - 19;
+        }
+    }
+    private void CategoryView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+    {
+        //-19 adjustment prevents horizontal scrollbar from appearing and accounts for width of vertical scrollbar
+        if (CategoryView.Columns[0].Width < CategoryView.Width - 19)
+        {
+            CategoryView.Columns[0].Width = CategoryView.Width - 19;
+        }
+    }
+    private void BinaryView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+    {
+        //-19 adjustment prevents horizontal scrollbar from appearing and accounts for width of vertical scrollbar
+        if (BinaryView.Columns[0].Width < BinaryView.Width - 19)
+        {
+            BinaryView.Columns[0].Width = BinaryView.Width - 19;
+        }
+    }
+    private void SIView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+    {
+        //-19 adjustment prevents horizontal scrollbar from appearing and accounts for width of vertical scrollbar
+        if (SIView.Columns[0].Width < SIView.Width - 19)
+        {
+            SIView.Columns[0].Width = SIView.Width - 19;
+        }
+    }
+    private void EquivalentsView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+    {
+        //-19 adjustment prevents horizontal scrollbar from appearing and accounts for width of vertical scrollbar
+        if (EquivalentsView.Columns[0].Width < EquivalentsView.Width - 19)
+        {
+            EquivalentsView.Columns[0].Width = EquivalentsView.Width - 19;
+        }
+    }
+    private void TemperatureView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+    {
+        //-19 adjustment prevents horizontal scrollbar from appearing and accounts for width of vertical scrollbar
+        if (TemperatureView.Columns[0].Width < TemperatureView.Width - 19)
+        {
+            TemperatureView.Columns[0].Width = TemperatureView.Width - 19;
+        }
+    }
+    //List view key binds
+    private void AllView_KeyDown(object sender, KeyEventArgs e)
+    {
+        string KeysPressed = e.KeyData.ToString();
+        if (KeysPressed == "C, Control")
+        {
+            ListViewCopy(AllView);
+        }
+        if (KeysPressed == "A, Control")
+        {
+            ListViewSelectAll(AllView);
+        }
+    }
+    private void CategoryView_KeyDown(object sender, KeyEventArgs e)
+    {
+        string KeysPressed = e.KeyData.ToString();
+        if (KeysPressed == "C, Control")
+        {
+            ListViewCopy(CategoryView);
+        }
+        if (KeysPressed == "A, Control")
+        {
+            ListViewSelectAll(CategoryView);
+        }
+    }
+    private void BinaryView_KeyDown(object sender, KeyEventArgs e)
+    {
+        string KeysPressed = e.KeyData.ToString();
+        if (KeysPressed == "C, Control")
+        {
+            ListViewCopy(BinaryView);
+        }
+        if (KeysPressed == "A, Control")
+        {
+            ListViewSelectAll(BinaryView);
+        }
+    }
+    private void SIView_KeyDown(object sender, KeyEventArgs e)
+    {
+        string KeysPressed = e.KeyData.ToString();
+        if (KeysPressed == "C, Control")
+        {
+            ListViewCopy(SIView);
+        }
+        if (KeysPressed == "A, Control")
+        {
+            ListViewSelectAll(SIView);
+        }
+    }
+    private void EquivalentsView_KeyDown(object sender, KeyEventArgs e)
+    {
+        string KeysPressed = e.KeyData.ToString();
+        if (KeysPressed == "C, Control")
+        {
+            ListViewCopy(EquivalentsView);
+        }
+        if (KeysPressed == "A, Control")
+        {
+            ListViewSelectAll(EquivalentsView);
+        }
+    }
+    private void TemperatureView_KeyDown(object sender, KeyEventArgs e)
+    {
+        string KeysPressed = e.KeyData.ToString();
+        if (KeysPressed == "C, Control")
+        {
+            ListViewCopy(TemperatureView);
+        }
+        if (KeysPressed == "A, Control")
+        {
+            ListViewSelectAll(TemperatureView);
+        }
+    }
+    //List view right click menu
+    private void AllView_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            //Track click location
+            AppState.RightClickLocation = "AllView";
+            //Open is added for list view
+            RightClickOpen.Visible = true;
+            //Cut is removed for list view
+            RightClickCut.Visible = false;
+            //Paste is removed for list view
+            RightClickPaste.Visible = false;
+            //Enable or disable open and copy depending on selection
+            if (AllView.SelectedItems.Count > 0)
+            {
+                RightClickOpen.Enabled = true;
+                RightClickCopy.Enabled = true;
+            }
+            else
+            {
+                RightClickOpen.Enabled = false;
+                RightClickCopy.Enabled = false;
+            }
+        }
+    }
+    private void CategoryView_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            //Track click location
+            AppState.RightClickLocation = "CategoryView";
+            //Open is added for list view
+            RightClickOpen.Visible = true;
+            //Cut is removed for list view
+            RightClickCut.Visible = false;
+            //Paste is removed for list view
+            RightClickPaste.Visible = false;
+            //Enable or disable open and copy depending on selection
+            if (CategoryView.SelectedItems.Count > 0)
+            {
+                RightClickOpen.Enabled = true;
+                RightClickCopy.Enabled = true;
+            }
+            else
+            {
+                RightClickOpen.Enabled = false;
+                RightClickCopy.Enabled = false;
+            }
+        }
+    }
+    private void BinaryView_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            //Track click location
+            AppState.RightClickLocation = "BinaryView";
+            //Open is added for list view
+            RightClickOpen.Visible = true;
+            //Cut is removed for list view
+            RightClickCut.Visible = false;
+            //Paste is removed for list view
+            RightClickPaste.Visible = false;
+            //Enable or disable open and copy depending on selection
+            if (BinaryView.SelectedItems.Count > 0)
+            {
+                RightClickOpen.Enabled = true;
+                RightClickCopy.Enabled = true;
+            }
+            else
+            {
+                RightClickOpen.Enabled = false;
+                RightClickCopy.Enabled = false;
+            }
+        }
+    }
+    private void SIView_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            //Track click location
+            AppState.RightClickLocation = "SIView";
+            //Open is added for list view
+            RightClickOpen.Visible = true;
+            //Cut is removed for list view
+            RightClickCut.Visible = false;
+            //Paste is removed for list view
+            RightClickPaste.Visible = false;
+            //Enable or disable open and copy depending on selection
+            if (SIView.SelectedItems.Count > 0)
+            {
+                RightClickOpen.Enabled = true;
+                RightClickCopy.Enabled = true;
+            }
+            else
+            {
+                RightClickOpen.Enabled = false;
+                RightClickCopy.Enabled = false;
+            }
+        }
+    }
+    private void EquivalentsView_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            //Track click location
+            AppState.RightClickLocation = "EquivalentsView";
+            //Open is added for list view
+            RightClickOpen.Visible = true;
+            //Cut is removed for list view
+            RightClickCut.Visible = false;
+            //Paste is removed for list view
+            RightClickPaste.Visible = false;
+            //Enable or disable open and copy depending on selection
+            if (EquivalentsView.SelectedItems.Count > 0)
+            {
+                RightClickOpen.Enabled = true;
+                RightClickCopy.Enabled = true;
+            }
+            else
+            {
+                RightClickOpen.Enabled = false;
+                RightClickCopy.Enabled = false;
+            }
+        }
+    }
+    private void TemperatureView_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            //Track click location
+            AppState.RightClickLocation = "TemperatureView";
+            //Open is added for list view
+            RightClickOpen.Visible = true;
+            //Cut is removed for list view
+            RightClickCut.Visible = false;
+            //Paste is removed for list view
+            RightClickPaste.Visible = false;
+            //Enable or disable open and copy depending on selection
+            if (TemperatureView.SelectedItems.Count > 0)
+            {
+                RightClickOpen.Enabled = true;
+                RightClickCopy.Enabled = true;
+            }
+            else
+            {
+                RightClickOpen.Enabled = false;
+                RightClickCopy.Enabled = false;
+            }
+        }
+    }
+    //List view item activate
+    private void AllView_ItemActivate(object sender, EventArgs e)
+    {
+        ShowUnitInfo(AllView.SelectedItems[0].Text);
+        Explorer.Visible = false;
+    }
+    private void CategoryView_ItemActivate(object sender, EventArgs e)
+    {
+        if (AppState.SecondMenu == "")
+        {
+            BackButton.Visible = true;
+            AppState.SecondMenu = CategoryView.SelectedItems[0].Text;
+            AppState.CurrentView = $"{AppState.SecondMenu} Units";
+            SetLabel(ExplorerLabel, ExploreSort.Location.X - ExplorerLabel.Location.X, AppState.CurrentView);
+            LoadExplorer();
+            PreviousState.SecondMenu = AppState.SecondMenu;
+        }
+        else
+        {
+            ShowUnitInfo(CategoryView.SelectedItems[0].Text);
+            Explorer.Visible = false;
+        }
+    }
+    private void BinaryView_ItemActivate(object sender, EventArgs e)
+    {
+        ShowPrefixInfo(BinaryView.SelectedItems[0].Text);
+        Explorer.Visible = false;
+    }
+    private void SIView_ItemActivate(object sender, EventArgs e)
+    {
+        ShowPrefixInfo(SIView.SelectedItems[0].Text);
+        Explorer.Visible = false;
+    }
+    private void EquivalentsView_ItemActivate(object sender, EventArgs e)
+    {
+        ShowUnitInfo(Database.SIEquivalents[EquivalentsView.SelectedItems[0].Text]);
+        Explorer.Visible = false;
+    }
+    private void TemperatureView_ItemActivate(object sender, EventArgs e)
+    {
+        if (AppState.FirstUnit == "")
+        {
+            BackButton.Visible = true;
+            AppState.FirstUnit = TemperatureView.SelectedItems[0].Text;
+            ExplorerLabel.Text = $"{AppState.FirstUnit} Formulas";
+            AppState.CurrentView = ExplorerLabel.Text;
+            LoadExplorer();
+            PreviousState.FirstUnit = AppState.FirstUnit;
+        }
+        else
+        {
+            ShowTemperatureFormula(AppState.FirstUnit, TemperatureView.SelectedItems[0].Text);
+            Explorer.Visible = false;
+        }
     }
 }
