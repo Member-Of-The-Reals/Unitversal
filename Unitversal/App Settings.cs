@@ -38,10 +38,6 @@ public static class AppState
     /// </summary>
     public static bool SortShown = false;
     /// <summary>
-    /// Tracks whether the text in <see cref="MainWindow.SearchBox"/> is greater than its width.
-    /// </summary>
-    public static bool EntryMaxed = false;
-    /// <summary>
     /// Tracks whether the search box query contains recognizable units from database.
     /// </summary>
     public static bool Recognized = false;

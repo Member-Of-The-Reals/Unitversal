@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Authors>Member Of The Reals</Authors>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 

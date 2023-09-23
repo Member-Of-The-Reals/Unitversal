@@ -44,13 +44,13 @@ public partial class MainWindow : Form
             //Anti-alias checkmark image
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             //Image rectangle
-            var R = new Rectangle(e.ImageRectangle.Location, e.ImageRectangle.Size);
-            //Make rectangle smaller
+            Rectangle R = new Rectangle(e.ImageRectangle.Location, e.ImageRectangle.Size);
+            //Make image smaller
             R.Inflate(-3, -4);
             //Drawing checkmark
             e.Graphics.DrawLines(AppState.SystemColorPen, new Point[]{
-                new Point(R.Left, R.Bottom - R.Height/2),
-                new Point(R.Left + R.Width/3,  R.Bottom),
+                new Point(R.Left, R.Bottom - R.Height / 2),
+                new Point(R.Left + R.Width / 3,  R.Bottom),
                 new Point(R.Right, R.Top)
             });
         }
@@ -63,7 +63,7 @@ public partial class MainWindow : Form
             Item.BackColor = AppState.BackgroundColor;
             Item.ForeColor = AppState.ForegroundColor;
             //Recursively change all items in a panel
-            if (Item is Panel)
+            if (Item is Panel || Item is SplitContainer)
             {
                 ChangeControlColors(Item);
             }

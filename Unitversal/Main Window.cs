@@ -9,8 +9,21 @@ public partial class MainWindow : Form
     {
         //Initialize main window components
         InitializeComponent();
+        AppAuthorText.Text = $"{Application.ProductName} {Application.ProductVersion}\r\n© 2023 Member Of The Reals";
+        //Scaling for high resolution displays
+        ClearSearchButton.Size = new Size(SearchBox.Height - 3, SearchBox.Height - 4);
+        ClearSearchButton.Location = new Point(SearchBox.Location.X + (SearchBox.Width - ClearSearchButton.Width - 2), SearchBox.Location.Y + 2);
+        SettingsButton.Height = SearchBox.Height;
+        Size AuthorTextSize = TextRenderer.MeasureText(AppAuthorText.Text, AppAuthorText.Font);
+        AppAuthorText.Width = AuthorTextSize.Width;
+        AppAuthorText.Height = AuthorTextSize.Height;
         //Redraw when resized to avoid visual artifacts
         SetStyle(ControlStyles.ResizeRedraw, true);
+        //Change renderer for right click and sort menu
+        RightClickMenu.Renderer = new ContextMenuRenderer();
+        SortMenu.Renderer = new ContextMenuRenderer();
+        RightClickMenu.PerformLayout();
+        SortMenu.PerformLayout();
         //Add autosizing width columns to list views
         SearchView.Columns.Add("Result", -1, HorizontalAlignment.Center);
         AllView.Columns.Add("Result", -1, HorizontalAlignment.Center);
@@ -19,10 +32,6 @@ public partial class MainWindow : Form
         SIView.Columns.Add("Result", -1, HorizontalAlignment.Center);
         EquivalentsView.Columns.Add("Result", -1, HorizontalAlignment.Center);
         TemperatureView.Columns.Add("Result", -1, HorizontalAlignment.Center);
-        //Change renderer for right click and sort menu
-        RightClickMenu.Renderer = new ContextMenuRenderer();
-        SortMenu.Renderer = new ContextMenuRenderer();
-        AppAuthorText.Text = $"{Application.ProductName} {Application.ProductVersion}\r\n© 2023 Member Of The Reals";
     }
     //Before main windows shows
     private void MainWindow_Load(object sender, EventArgs e)
@@ -261,7 +270,7 @@ public partial class MainWindow : Form
             {
                 TemperatureView.Columns[0].Width = -1;
             }
-            ScrollTextContents(true);
+            ScrollTextContents();
             Settings.WindowSize = Size;
         }
     }
@@ -340,12 +349,12 @@ public partial class MainWindow : Form
         switch (AppState.RightClickLocation)
         {
             case "SearchBox":
-                SearchBox.SelectAll();
                 SearchBox.Focus();
+                SearchBox.SelectAll();
                 break;
             case "DescriptionText":
-                DescriptionText.SelectAll();
                 DescriptionText.Focus();
+                DescriptionText.SelectAll();
                 break;
             default:
                 ListViewSelectAll(Controls.Find(AppState.RightClickLocation, true)[0] as ListView);
@@ -400,7 +409,7 @@ public partial class MainWindow : Form
         if (SearchBox.Text.Length > 0)
         {
             ClearSearchButton.Visible = true;
-            SearchBox.PadSize = 25; //Prevent clear button from blocking text
+            SearchBox.PadSize = ClearSearchButton.Width + 1; //Prevent clear button from blocking text
             SearchBox.SetMargin();
         }
         else
@@ -410,7 +419,7 @@ public partial class MainWindow : Form
             SearchBox.SetMargin();
         }
         AppState.Recognized = false;
-        ScrollTextContents(false);
+        ScrollTextContents();
         string CurrentQuery = SearchBox.Text.Trim();
         if (CurrentQuery.Length == 0)
         {
@@ -1034,9 +1043,9 @@ public partial class MainWindow : Form
     //
     private void ExploreMenuButton_Click(object sender, EventArgs e)
     {
-        if (Explorer.SplitterDistance != 30)
+        if (Explorer.SplitterDistance != ExploreMenuButton.Width)
         {
-            Explorer.SplitterDistance = 30;
+            Explorer.SplitterDistance = ExploreMenuButton.Width;
             AllButton.Visible = false;
             CategoryButton.Visible = false;
             BinaryButton.Visible = false;
@@ -1048,7 +1057,7 @@ public partial class MainWindow : Form
         }
         else
         {
-            Explorer.SplitterDistance = 150;
+            Explorer.SplitterDistance = (int)(TextRenderer.MeasureText(TemperatureButton.Text, TemperatureButton.Font).Width * 1.2);
             AllButton.Visible = true;
             CategoryButton.Visible = true;
             BinaryButton.Visible = true;
@@ -1073,6 +1082,20 @@ public partial class MainWindow : Form
             View.EndUpdate();
         }
         SetLabel(ExplorerLabel, ExploreSort.Location.X - ExplorerLabel.Location.X, AppState.CurrentView);
+    }
+    //Manages width of buttons when window resizes
+    private void Explorer_Resize(object sender, EventArgs e)
+    {
+        int Width = (int)(TextRenderer.MeasureText(TemperatureButton.Text, TemperatureButton.Font).Width * 1.2);
+        Explorer.SplitterDistance = Width;
+        AllButton.Width = Width;
+        CategoryButton.Width = Width;
+        BinaryButton.Width = Width;
+        SIButton.Width = Width;
+        EquivalentsButton.Width = Width;
+        TemperatureButton.Width = Width;
+        BackButton.Width = Width;
+        ExitButton.Width = Width;
     }
     private void AllButton_Click(object sender, EventArgs e)
     {

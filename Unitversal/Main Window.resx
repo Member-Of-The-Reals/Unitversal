@@ -898,6 +898,15 @@ Public License instead of this License.  But first, please read
                                     CHANGELOG                                   
 ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
 
+Version 1.2.1 | 2023-09-22
+
+Bug Fixes
+&gt; Rendering issues for higher resolution displays.
+&gt; Pasting text longer than search box not properly scrolling to the end.
+&gt; Dark mode not working properly in explore mode.
+
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━●
+
 Version 1.2.0 | 2023-08-22
 
 Bug Fixes

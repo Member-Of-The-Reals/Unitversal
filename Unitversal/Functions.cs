@@ -253,33 +253,25 @@ public partial class MainWindow : Form
     /// <summary>
     /// Scroll search box contents when search box is overflowed with text.
     /// </summary>
-    private void ScrollTextContents(bool Resized)
+    private void ScrollTextContents()
     {
         //Get width of string in pixels
         int StringWidth = TextRenderer.MeasureText(SearchBox.Text, SearchBox.Font).Width;
-        if (StringWidth > SearchBox.Width - 100)
+        if (StringWidth > SearchBox.Width - 21) //-21 offset is required to properly scroll to the first character
         {
-            AppState.EntryMaxed = true;
-            //Scrolls content and preserve cursor position after search box becomes smaller from resize
-            if (Resized)
-            {
-                int CurrentPosition = SearchBox.SelectionStart;
-                SearchBox.SelectionStart = SearchBox.TextLength - 1; //Scroll
-                SearchBox.SelectionStart = CurrentPosition; //Reset cursor position
-            }
+            //Scrolls content to end and preserve cursor position when box is overflowed
+            int CurrentPosition = SearchBox.SelectionStart;
+            SearchBox.SelectionStart = SearchBox.TextLength - 1; //Scroll
+            SearchBox.SelectionStart = CurrentPosition; //Reset cursor position
         }
         else
         {
-            //Scrolls search box contents to beginning when box is no longer overflowed
-            if (AppState.EntryMaxed)
-            {
-                int CurrentPosition = SearchBox.SelectionStart;
-                SearchBox.SelectionStart = 0; //Scroll
-                SearchBox.SelectionStart = CurrentPosition; //Reset cursor position
-                AppState.EntryMaxed = false;
-            }
+            //Scrolls content to beginning and preserve cursor position when box is no longer overflowed
+            int CurrentPosition = SearchBox.SelectionStart;
+            SearchBox.SelectionStart = 0; //Scroll
+            SearchBox.SelectionStart = CurrentPosition; //Reset cursor position
         }
-        SearchBox.Focus();
+        SearchBox.Focus(); //Maximize removes focus from the search box
     }
     //
     //————————————————————Interpretation Text————————————————————

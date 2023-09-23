@@ -181,7 +181,7 @@ partial class MainWindow
         CloseButton.FlatAppearance.BorderSize = 0;
         CloseButton.FlatStyle = FlatStyle.Flat;
         CloseButton.Font = new Font("Segoe MDL2 Assets", 10F, FontStyle.Regular, GraphicsUnit.Point);
-        CloseButton.Location = new Point(347, 0);
+        CloseButton.Location = new Point(348, 0);
         CloseButton.Name = "CloseButton";
         CloseButton.Size = new Size(50, 30);
         CloseButton.TabIndex = 0;
@@ -195,7 +195,7 @@ partial class MainWindow
         MaximizeButton.FlatAppearance.BorderSize = 0;
         MaximizeButton.FlatStyle = FlatStyle.Flat;
         MaximizeButton.Font = new Font("Segoe MDL2 Assets", 10F, FontStyle.Regular, GraphicsUnit.Point);
-        MaximizeButton.Location = new Point(297, 0);
+        MaximizeButton.Location = new Point(298, 0);
         MaximizeButton.Name = "MaximizeButton";
         MaximizeButton.Size = new Size(50, 30);
         MaximizeButton.TabIndex = 1;
@@ -209,7 +209,7 @@ partial class MainWindow
         MinimizeButton.FlatAppearance.BorderSize = 0;
         MinimizeButton.FlatStyle = FlatStyle.Flat;
         MinimizeButton.Font = new Font("Segoe MDL2 Assets", 10F, FontStyle.Regular, GraphicsUnit.Point);
-        MinimizeButton.Location = new Point(247, 0);
+        MinimizeButton.Location = new Point(248, 0);
         MinimizeButton.Name = "MinimizeButton";
         MinimizeButton.Size = new Size(50, 30);
         MinimizeButton.TabIndex = 2;
@@ -223,7 +223,6 @@ partial class MainWindow
         Title.AutoSize = true;
         Title.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
         Title.Location = new Point(16, 6);
-        Title.Margin = new Padding(0);
         Title.Name = "Title";
         Title.Size = new Size(65, 17);
         Title.TabIndex = 3;
@@ -249,11 +248,10 @@ partial class MainWindow
         // 
         SearchBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         SearchBox.ContextMenuStrip = RightClickMenu;
-        SearchBox.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+        SearchBox.Font = new Font("Segoe UI", 11.8F, FontStyle.Regular, GraphicsUnit.Point);
         SearchBox.Location = new Point(20, 40);
-        SearchBox.MaximumSize = new Size(9999, 28);
+        SearchBox.MaximumSize = new Size(1000000000, 1000000000);
         SearchBox.MaxLength = 43679;
-        SearchBox.MinimumSize = new Size(50, 28);
         SearchBox.Name = "SearchBox";
         SearchBox.Size = new Size(314, 28);
         SearchBox.TabIndex = 5;
@@ -307,10 +305,10 @@ partial class MainWindow
         ClearSearchButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         ClearSearchButton.FlatAppearance.BorderSize = 0;
         ClearSearchButton.FlatStyle = FlatStyle.Flat;
-        ClearSearchButton.Font = new Font("Segoe MDL2 Assets", 6.5F, FontStyle.Regular, GraphicsUnit.Point);
-        ClearSearchButton.Location = new Point(308, 42);
+        ClearSearchButton.Font = new Font("Segoe MDL2 Assets", 7F, FontStyle.Regular, GraphicsUnit.Point);
+        ClearSearchButton.Location = new Point(20, 40);
         ClearSearchButton.Name = "ClearSearchButton";
-        ClearSearchButton.Size = new Size(24, 24);
+        ClearSearchButton.Size = new Size(29, 29);
         ClearSearchButton.TabIndex = 0;
         ClearSearchButton.TabStop = false;
         ClearSearchButton.Text = "";
@@ -323,7 +321,6 @@ partial class MainWindow
         InterpretLabel.AutoSize = true;
         InterpretLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
         InterpretLabel.Location = new Point(20, 76);
-        InterpretLabel.Margin = new Padding(0);
         InterpretLabel.MaximumSize = new Size(297, 15);
         InterpretLabel.MinimumSize = new Size(0, 15);
         InterpretLabel.Name = "InterpretLabel";
@@ -349,11 +346,8 @@ partial class MainWindow
         SettingsButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         SettingsButton.FlatAppearance.BorderSize = 0;
         SettingsButton.FlatStyle = FlatStyle.Flat;
-        SettingsButton.Font = new Font("Segoe UI Emoji", 12F, FontStyle.Regular, GraphicsUnit.Point);
+        SettingsButton.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
         SettingsButton.Location = new Point(340, 40);
-        SettingsButton.Margin = new Padding(0);
-        SettingsButton.MaximumSize = new Size(40, 28);
-        SettingsButton.MinimumSize = new Size(40, 28);
         SettingsButton.Name = "SettingsButton";
         SettingsButton.Size = new Size(40, 28);
         SettingsButton.TabIndex = 6;
@@ -431,7 +425,6 @@ partial class MainWindow
         SearchView.FullRowSelect = true;
         SearchView.HeaderStyle = ColumnHeaderStyle.None;
         SearchView.Location = new Point(20, 101);
-        SearchView.Margin = new Padding(0);
         SearchView.Name = "SearchView";
         SearchView.Size = new Size(360, 232);
         SearchView.TabIndex = 9;
@@ -473,7 +466,6 @@ partial class MainWindow
         InfoCloseButton.Anchor = AnchorStyles.Bottom;
         InfoCloseButton.FlatStyle = FlatStyle.Flat;
         InfoCloseButton.Location = new Point(162, 282);
-        InfoCloseButton.Margin = new Padding(0);
         InfoCloseButton.Name = "InfoCloseButton";
         InfoCloseButton.Size = new Size(54, 24);
         InfoCloseButton.TabIndex = 12;
@@ -527,7 +519,6 @@ partial class MainWindow
         SettingsPanel.Controls.Add(SaveButton);
         SettingsPanel.Controls.Add(CancButton);
         SettingsPanel.Location = new Point(1, 31);
-        SettingsPanel.Margin = new Padding(0);
         SettingsPanel.Name = "SettingsPanel";
         SettingsPanel.Size = new Size(398, 318);
         SettingsPanel.TabIndex = 13;
@@ -539,7 +530,6 @@ partial class MainWindow
         SettingsLabel.AutoSize = true;
         SettingsLabel.Font = new Font("Segoe UI Semibold", 15F, FontStyle.Bold, GraphicsUnit.Point);
         SettingsLabel.Location = new Point(21, 6);
-        SettingsLabel.Margin = new Padding(0);
         SettingsLabel.Name = "SettingsLabel";
         SettingsLabel.Size = new Size(86, 28);
         SettingsLabel.TabIndex = 0;
@@ -551,7 +541,6 @@ partial class MainWindow
         GeneralSettingsLabel.AutoSize = true;
         GeneralSettingsLabel.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point);
         GeneralSettingsLabel.Location = new Point(22, 45);
-        GeneralSettingsLabel.Margin = new Padding(0);
         GeneralSettingsLabel.Name = "GeneralSettingsLabel";
         GeneralSettingsLabel.Size = new Size(66, 21);
         GeneralSettingsLabel.TabIndex = 1;
@@ -562,7 +551,6 @@ partial class MainWindow
         PositionCheckbox.Anchor = AnchorStyles.Top;
         PositionCheckbox.AutoSize = true;
         PositionCheckbox.Location = new Point(28, 80);
-        PositionCheckbox.Margin = new Padding(0);
         PositionCheckbox.Name = "PositionCheckbox";
         PositionCheckbox.Size = new Size(177, 19);
         PositionCheckbox.TabIndex = 2;
@@ -574,7 +562,6 @@ partial class MainWindow
         SizeCheckbox.Anchor = AnchorStyles.Top;
         SizeCheckbox.AutoSize = true;
         SizeCheckbox.Location = new Point(212, 80);
-        SizeCheckbox.Margin = new Padding(0);
         SizeCheckbox.Name = "SizeCheckbox";
         SizeCheckbox.Size = new Size(154, 19);
         SizeCheckbox.TabIndex = 3;
@@ -586,7 +573,6 @@ partial class MainWindow
         CurrencyCheckbox.Anchor = AnchorStyles.Top;
         CurrencyCheckbox.AutoSize = true;
         CurrencyCheckbox.Location = new Point(28, 115);
-        CurrencyCheckbox.Margin = new Padding(0);
         CurrencyCheckbox.Name = "CurrencyCheckbox";
         CurrencyCheckbox.Size = new Size(178, 19);
         CurrencyCheckbox.TabIndex = 4;
@@ -599,7 +585,6 @@ partial class MainWindow
         ConversionSettingsLabel.AutoSize = true;
         ConversionSettingsLabel.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point);
         ConversionSettingsLabel.Location = new Point(22, 150);
-        ConversionSettingsLabel.Margin = new Padding(0);
         ConversionSettingsLabel.Name = "ConversionSettingsLabel";
         ConversionSettingsLabel.Size = new Size(99, 21);
         ConversionSettingsLabel.TabIndex = 5;
@@ -610,7 +595,6 @@ partial class MainWindow
         SignificantFiguresLabel.Anchor = AnchorStyles.Top;
         SignificantFiguresLabel.AutoSize = true;
         SignificantFiguresLabel.Location = new Point(22, 185);
-        SignificantFiguresLabel.Margin = new Padding(0);
         SignificantFiguresLabel.Name = "SignificantFiguresLabel";
         SignificantFiguresLabel.Size = new Size(99, 15);
         SignificantFiguresLabel.TabIndex = 6;
@@ -620,7 +604,6 @@ partial class MainWindow
         // 
         SignificantFiguresEntry.Anchor = AnchorStyles.Top;
         SignificantFiguresEntry.Location = new Point(122, 183);
-        SignificantFiguresEntry.Margin = new Padding(0);
         SignificantFiguresEntry.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
         SignificantFiguresEntry.Name = "SignificantFiguresEntry";
         SignificantFiguresEntry.Size = new Size(45, 23);
@@ -642,7 +625,6 @@ partial class MainWindow
         // 
         DecimalSeparatorEntry.Anchor = AnchorStyles.Top;
         DecimalSeparatorEntry.Location = new Point(288, 183);
-        DecimalSeparatorEntry.Margin = new Padding(0);
         DecimalSeparatorEntry.MaxLength = 1;
         DecimalSeparatorEntry.Name = "DecimalSeparatorEntry";
         DecimalSeparatorEntry.Size = new Size(15, 23);
@@ -655,7 +637,6 @@ partial class MainWindow
         IntegerGroupSeparatorLabel.Anchor = AnchorStyles.Top;
         IntegerGroupSeparatorLabel.AutoSize = true;
         IntegerGroupSeparatorLabel.Location = new Point(22, 220);
-        IntegerGroupSeparatorLabel.Margin = new Padding(0);
         IntegerGroupSeparatorLabel.Name = "IntegerGroupSeparatorLabel";
         IntegerGroupSeparatorLabel.Size = new Size(153, 15);
         IntegerGroupSeparatorLabel.TabIndex = 10;
@@ -665,7 +646,6 @@ partial class MainWindow
         // 
         IntegerGroupSeparatorEntry.Anchor = AnchorStyles.Top;
         IntegerGroupSeparatorEntry.Location = new Point(183, 218);
-        IntegerGroupSeparatorEntry.Margin = new Padding(0);
         IntegerGroupSeparatorEntry.MaxLength = 1;
         IntegerGroupSeparatorEntry.Name = "IntegerGroupSeparatorEntry";
         IntegerGroupSeparatorEntry.Size = new Size(15, 23);
@@ -678,7 +658,6 @@ partial class MainWindow
         IntegerGroupSizeLabel.Anchor = AnchorStyles.Top;
         IntegerGroupSizeLabel.AutoSize = true;
         IntegerGroupSizeLabel.Location = new Point(212, 220);
-        IntegerGroupSizeLabel.Margin = new Padding(0);
         IntegerGroupSizeLabel.Name = "IntegerGroupSizeLabel";
         IntegerGroupSizeLabel.Size = new Size(106, 15);
         IntegerGroupSizeLabel.TabIndex = 12;
@@ -688,7 +667,6 @@ partial class MainWindow
         // 
         IntegerGroupSizeEntry.Anchor = AnchorStyles.Top;
         IntegerGroupSizeEntry.Location = new Point(327, 218);
-        IntegerGroupSizeEntry.Margin = new Padding(0);
         IntegerGroupSizeEntry.Maximum = new decimal(new int[] { 9, 0, 0, 0 });
         IntegerGroupSizeEntry.Name = "IntegerGroupSizeEntry";
         IntegerGroupSizeEntry.Size = new Size(29, 23);
@@ -701,7 +679,6 @@ partial class MainWindow
         DecimalGroupSeparatorLabel.Anchor = AnchorStyles.Top;
         DecimalGroupSeparatorLabel.AutoSize = true;
         DecimalGroupSeparatorLabel.Location = new Point(22, 255);
-        DecimalGroupSeparatorLabel.Margin = new Padding(0);
         DecimalGroupSeparatorLabel.Name = "DecimalGroupSeparatorLabel";
         DecimalGroupSeparatorLabel.Size = new Size(159, 15);
         DecimalGroupSeparatorLabel.TabIndex = 14;
@@ -711,7 +688,6 @@ partial class MainWindow
         // 
         DecimalGroupSeparatorEntry.Anchor = AnchorStyles.Top;
         DecimalGroupSeparatorEntry.Location = new Point(183, 253);
-        DecimalGroupSeparatorEntry.Margin = new Padding(0);
         DecimalGroupSeparatorEntry.MaxLength = 1;
         DecimalGroupSeparatorEntry.Name = "DecimalGroupSeparatorEntry";
         DecimalGroupSeparatorEntry.Size = new Size(15, 23);
@@ -724,7 +700,6 @@ partial class MainWindow
         DecimalGroupSizeLabel.Anchor = AnchorStyles.Top;
         DecimalGroupSizeLabel.AutoSize = true;
         DecimalGroupSizeLabel.Location = new Point(212, 255);
-        DecimalGroupSizeLabel.Margin = new Padding(0);
         DecimalGroupSizeLabel.Name = "DecimalGroupSizeLabel";
         DecimalGroupSizeLabel.Size = new Size(112, 15);
         DecimalGroupSizeLabel.TabIndex = 16;
@@ -734,7 +709,6 @@ partial class MainWindow
         // 
         DecimalGroupSizeEntry.Anchor = AnchorStyles.Top;
         DecimalGroupSizeEntry.Location = new Point(327, 253);
-        DecimalGroupSizeEntry.Margin = new Padding(0);
         DecimalGroupSizeEntry.Maximum = new decimal(new int[] { 9, 0, 0, 0 });
         DecimalGroupSizeEntry.Name = "DecimalGroupSizeEntry";
         DecimalGroupSizeEntry.Size = new Size(29, 23);
@@ -758,7 +732,6 @@ partial class MainWindow
         LargeMagnitudeLabel.Anchor = AnchorStyles.Top;
         LargeMagnitudeLabel.AutoSize = true;
         LargeMagnitudeLabel.Location = new Point(22, 325);
-        LargeMagnitudeLabel.Margin = new Padding(0);
         LargeMagnitudeLabel.Name = "LargeMagnitudeLabel";
         LargeMagnitudeLabel.Size = new Size(185, 15);
         LargeMagnitudeLabel.TabIndex = 19;
@@ -768,7 +741,6 @@ partial class MainWindow
         // 
         LargeMagnitudeEntry.Anchor = AnchorStyles.Top;
         LargeMagnitudeEntry.Location = new Point(213, 323);
-        LargeMagnitudeEntry.Margin = new Padding(0);
         LargeMagnitudeEntry.Maximum = new decimal(new int[] { -1304428545, 434162106, 542, 0 });
         LargeMagnitudeEntry.Name = "LargeMagnitudeEntry";
         LargeMagnitudeEntry.Size = new Size(90, 23);
@@ -789,7 +761,6 @@ partial class MainWindow
         // 
         LargeExponentEntry.Anchor = AnchorStyles.Top;
         LargeExponentEntry.Location = new Point(331, 323);
-        LargeExponentEntry.Margin = new Padding(0);
         LargeExponentEntry.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
         LargeExponentEntry.Name = "LargeExponentEntry";
         LargeExponentEntry.Size = new Size(45, 23);
@@ -801,7 +772,6 @@ partial class MainWindow
         SmallMagnitudeLabel.Anchor = AnchorStyles.Top;
         SmallMagnitudeLabel.AutoSize = true;
         SmallMagnitudeLabel.Location = new Point(22, 360);
-        SmallMagnitudeLabel.Margin = new Padding(0);
         SmallMagnitudeLabel.Name = "SmallMagnitudeLabel";
         SmallMagnitudeLabel.Size = new Size(169, 15);
         SmallMagnitudeLabel.TabIndex = 23;
@@ -811,7 +781,6 @@ partial class MainWindow
         // 
         SmallMagnitudeEntry.Anchor = AnchorStyles.Top;
         SmallMagnitudeEntry.Location = new Point(213, 358);
-        SmallMagnitudeEntry.Margin = new Padding(0);
         SmallMagnitudeEntry.Maximum = new decimal(new int[] { -1304428545, 434162106, 542, 0 });
         SmallMagnitudeEntry.Name = "SmallMagnitudeEntry";
         SmallMagnitudeEntry.Size = new Size(90, 23);
@@ -832,7 +801,6 @@ partial class MainWindow
         // 
         SmallExponentEntry.Anchor = AnchorStyles.Top;
         SmallExponentEntry.Location = new Point(331, 358);
-        SmallExponentEntry.Margin = new Padding(0);
         SmallExponentEntry.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
         SmallExponentEntry.Name = "SmallExponentEntry";
         SmallExponentEntry.Size = new Size(45, 23);
@@ -845,7 +813,6 @@ partial class MainWindow
         AppearLabel.AutoSize = true;
         AppearLabel.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point);
         AppearLabel.Location = new Point(22, 395);
-        AppearLabel.Margin = new Padding(0);
         AppearLabel.Name = "AppearLabel";
         AppearLabel.Size = new Size(98, 21);
         AppearLabel.TabIndex = 27;
@@ -856,7 +823,6 @@ partial class MainWindow
         LightMode.Anchor = AnchorStyles.Top;
         LightMode.AutoSize = true;
         LightMode.Location = new Point(28, 430);
-        LightMode.Margin = new Padding(0);
         LightMode.Name = "LightMode";
         LightMode.Size = new Size(52, 19);
         LightMode.TabIndex = 28;
@@ -869,7 +835,6 @@ partial class MainWindow
         DarkMode.Anchor = AnchorStyles.Top;
         DarkMode.AutoSize = true;
         DarkMode.Location = new Point(28, 465);
-        DarkMode.Margin = new Padding(0);
         DarkMode.Name = "DarkMode";
         DarkMode.Size = new Size(49, 19);
         DarkMode.TabIndex = 29;
@@ -883,7 +848,6 @@ partial class MainWindow
         SystemMode.AutoSize = true;
         SystemMode.Checked = true;
         SystemMode.Location = new Point(28, 500);
-        SystemMode.Margin = new Padding(0);
         SystemMode.Name = "SystemMode";
         SystemMode.Size = new Size(63, 19);
         SystemMode.TabIndex = 30;
@@ -897,7 +861,6 @@ partial class MainWindow
         HelpLabel.AutoSize = true;
         HelpLabel.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point);
         HelpLabel.Location = new Point(22, 535);
-        HelpLabel.Margin = new Padding(0);
         HelpLabel.Name = "HelpLabel";
         HelpLabel.Size = new Size(45, 21);
         HelpLabel.TabIndex = 31;
@@ -944,7 +907,6 @@ partial class MainWindow
         AboutLabel.AutoSize = true;
         AboutLabel.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point);
         AboutLabel.Location = new Point(22, 640);
-        AboutLabel.Margin = new Padding(0);
         AboutLabel.Name = "AboutLabel";
         AboutLabel.Size = new Size(56, 21);
         AboutLabel.TabIndex = 35;
@@ -955,7 +917,6 @@ partial class MainWindow
         AppAuthorText.Anchor = AnchorStyles.Top;
         AppAuthorText.BorderStyle = BorderStyle.None;
         AppAuthorText.Location = new Point(22, 670);
-        AppAuthorText.Margin = new Padding(0);
         AppAuthorText.Multiline = true;
         AppAuthorText.Name = "AppAuthorText";
         AppAuthorText.ReadOnly = true;
@@ -1011,7 +972,6 @@ partial class MainWindow
         AboutDisplay.Controls.Add(ChangelogTextBox);
         AboutDisplay.Controls.Add(AboutCloseButton);
         AboutDisplay.Location = new Point(1, 31);
-        AboutDisplay.Margin = new Padding(0);
         AboutDisplay.Name = "AboutDisplay";
         AboutDisplay.Size = new Size(398, 318);
         AboutDisplay.TabIndex = 41;
@@ -1021,7 +981,6 @@ partial class MainWindow
         // 
         NoticeButton.FlatStyle = FlatStyle.Flat;
         NoticeButton.Location = new Point(0, 0);
-        NoticeButton.Margin = new Padding(0);
         NoticeButton.Name = "NoticeButton";
         NoticeButton.Size = new Size(75, 28);
         NoticeButton.TabIndex = 14;
@@ -1036,7 +995,6 @@ partial class MainWindow
         NoticeTextBox.BorderStyle = BorderStyle.None;
         NoticeTextBox.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
         NoticeTextBox.Location = new Point(10, 35);
-        NoticeTextBox.Margin = new Padding(0);
         NoticeTextBox.Multiline = true;
         NoticeTextBox.Name = "NoticeTextBox";
         NoticeTextBox.ReadOnly = true;
@@ -1050,7 +1008,6 @@ partial class MainWindow
         // 
         LicenseButton.FlatStyle = FlatStyle.Flat;
         LicenseButton.Location = new Point(74, 0);
-        LicenseButton.Margin = new Padding(0);
         LicenseButton.Name = "LicenseButton";
         LicenseButton.Size = new Size(75, 28);
         LicenseButton.TabIndex = 15;
@@ -1065,7 +1022,6 @@ partial class MainWindow
         LicenseTextBox.BorderStyle = BorderStyle.None;
         LicenseTextBox.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
         LicenseTextBox.Location = new Point(10, 35);
-        LicenseTextBox.Margin = new Padding(0);
         LicenseTextBox.Multiline = true;
         LicenseTextBox.Name = "LicenseTextBox";
         LicenseTextBox.ReadOnly = true;
@@ -1079,7 +1035,6 @@ partial class MainWindow
         // 
         ChangelogButton.FlatStyle = FlatStyle.Flat;
         ChangelogButton.Location = new Point(148, 0);
-        ChangelogButton.Margin = new Padding(0);
         ChangelogButton.Name = "ChangelogButton";
         ChangelogButton.Size = new Size(75, 28);
         ChangelogButton.TabIndex = 16;
@@ -1094,7 +1049,6 @@ partial class MainWindow
         ChangelogTextBox.BorderStyle = BorderStyle.None;
         ChangelogTextBox.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
         ChangelogTextBox.Location = new Point(10, 35);
-        ChangelogTextBox.Margin = new Padding(0);
         ChangelogTextBox.Multiline = true;
         ChangelogTextBox.Name = "ChangelogTextBox";
         ChangelogTextBox.ReadOnly = true;
@@ -1109,7 +1063,6 @@ partial class MainWindow
         AboutCloseButton.Anchor = AnchorStyles.Bottom;
         AboutCloseButton.FlatStyle = FlatStyle.Flat;
         AboutCloseButton.Location = new Point(172, 292);
-        AboutCloseButton.Margin = new Padding(0);
         AboutCloseButton.Name = "AboutCloseButton";
         AboutCloseButton.Size = new Size(54, 24);
         AboutCloseButton.TabIndex = 13;
@@ -1120,10 +1073,8 @@ partial class MainWindow
         // Explorer
         // 
         Explorer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-        Explorer.FixedPanel = FixedPanel.Panel1;
         Explorer.IsSplitterFixed = true;
         Explorer.Location = new Point(1, 31);
-        Explorer.Margin = new Padding(0);
         Explorer.Name = "Explorer";
         // 
         // Explorer.Panel1
@@ -1137,7 +1088,6 @@ partial class MainWindow
         Explorer.Panel1.Controls.Add(TemperatureButton);
         Explorer.Panel1.Controls.Add(BackButton);
         Explorer.Panel1.Controls.Add(ExitButton);
-        Explorer.Panel1MinSize = 0;
         // 
         // Explorer.Panel2
         // 
@@ -1149,11 +1099,11 @@ partial class MainWindow
         Explorer.Panel2.Controls.Add(SIView);
         Explorer.Panel2.Controls.Add(EquivalentsView);
         Explorer.Panel2.Controls.Add(TemperatureView);
-        Explorer.Panel2MinSize = 200;
         Explorer.Size = new Size(398, 318);
         Explorer.SplitterDistance = 150;
         Explorer.TabIndex = 17;
         Explorer.Visible = false;
+        Explorer.Resize += Explorer_Resize;
         // 
         // ExploreMenuButton
         // 
@@ -1161,7 +1111,6 @@ partial class MainWindow
         ExploreMenuButton.FlatStyle = FlatStyle.Flat;
         ExploreMenuButton.Font = new Font("Segoe MDL2 Assets", 12F, FontStyle.Regular, GraphicsUnit.Point);
         ExploreMenuButton.Location = new Point(0, 0);
-        ExploreMenuButton.Margin = new Padding(0);
         ExploreMenuButton.Name = "ExploreMenuButton";
         ExploreMenuButton.Size = new Size(30, 30);
         ExploreMenuButton.TabIndex = 16;
@@ -1175,9 +1124,8 @@ partial class MainWindow
         AllButton.FlatAppearance.BorderSize = 0;
         AllButton.FlatStyle = FlatStyle.Flat;
         AllButton.Location = new Point(0, 31);
-        AllButton.Margin = new Padding(0);
         AllButton.Name = "AllButton";
-        AllButton.Size = new Size(150, 28);
+        AllButton.Size = new Size(148, 28);
         AllButton.TabIndex = 15;
         AllButton.Text = "All Units";
         AllButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1190,9 +1138,8 @@ partial class MainWindow
         CategoryButton.FlatAppearance.BorderSize = 0;
         CategoryButton.FlatStyle = FlatStyle.Flat;
         CategoryButton.Location = new Point(0, 59);
-        CategoryButton.Margin = new Padding(0);
         CategoryButton.Name = "CategoryButton";
-        CategoryButton.Size = new Size(150, 28);
+        CategoryButton.Size = new Size(148, 28);
         CategoryButton.TabIndex = 17;
         CategoryButton.Text = "Units By Category";
         CategoryButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1205,9 +1152,8 @@ partial class MainWindow
         BinaryButton.FlatAppearance.BorderSize = 0;
         BinaryButton.FlatStyle = FlatStyle.Flat;
         BinaryButton.Location = new Point(0, 87);
-        BinaryButton.Margin = new Padding(0);
         BinaryButton.Name = "BinaryButton";
-        BinaryButton.Size = new Size(150, 28);
+        BinaryButton.Size = new Size(148, 28);
         BinaryButton.TabIndex = 18;
         BinaryButton.Text = "Binary Prefixes";
         BinaryButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1220,9 +1166,8 @@ partial class MainWindow
         SIButton.FlatAppearance.BorderSize = 0;
         SIButton.FlatStyle = FlatStyle.Flat;
         SIButton.Location = new Point(0, 115);
-        SIButton.Margin = new Padding(0);
         SIButton.Name = "SIButton";
-        SIButton.Size = new Size(150, 28);
+        SIButton.Size = new Size(148, 28);
         SIButton.TabIndex = 19;
         SIButton.Text = "SI Prefixes";
         SIButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1235,9 +1180,8 @@ partial class MainWindow
         EquivalentsButton.FlatAppearance.BorderSize = 0;
         EquivalentsButton.FlatStyle = FlatStyle.Flat;
         EquivalentsButton.Location = new Point(0, 143);
-        EquivalentsButton.Margin = new Padding(0);
         EquivalentsButton.Name = "EquivalentsButton";
-        EquivalentsButton.Size = new Size(150, 28);
+        EquivalentsButton.Size = new Size(148, 28);
         EquivalentsButton.TabIndex = 20;
         EquivalentsButton.Text = "SI Equivalents";
         EquivalentsButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1250,9 +1194,8 @@ partial class MainWindow
         TemperatureButton.FlatAppearance.BorderSize = 0;
         TemperatureButton.FlatStyle = FlatStyle.Flat;
         TemperatureButton.Location = new Point(0, 171);
-        TemperatureButton.Margin = new Padding(0);
         TemperatureButton.Name = "TemperatureButton";
-        TemperatureButton.Size = new Size(150, 28);
+        TemperatureButton.Size = new Size(148, 28);
         TemperatureButton.TabIndex = 21;
         TemperatureButton.Text = "Temperature Formulas";
         TemperatureButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1265,9 +1208,8 @@ partial class MainWindow
         BackButton.FlatAppearance.BorderSize = 0;
         BackButton.FlatStyle = FlatStyle.Flat;
         BackButton.Location = new Point(0, 262);
-        BackButton.Margin = new Padding(0);
         BackButton.Name = "BackButton";
-        BackButton.Size = new Size(150, 28);
+        BackButton.Size = new Size(148, 28);
         BackButton.TabIndex = 23;
         BackButton.Text = "Back";
         BackButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1281,9 +1223,8 @@ partial class MainWindow
         ExitButton.FlatAppearance.BorderSize = 0;
         ExitButton.FlatStyle = FlatStyle.Flat;
         ExitButton.Location = new Point(0, 290);
-        ExitButton.Margin = new Padding(0);
         ExitButton.Name = "ExitButton";
-        ExitButton.Size = new Size(150, 28);
+        ExitButton.Size = new Size(148, 28);
         ExitButton.TabIndex = 22;
         ExitButton.Text = "Exit";
         ExitButton.TextAlign = ContentAlignment.MiddleLeft;
@@ -1295,7 +1236,6 @@ partial class MainWindow
         ExplorerLabel.AutoSize = true;
         ExplorerLabel.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold, GraphicsUnit.Point);
         ExplorerLabel.Location = new Point(0, 6);
-        ExplorerLabel.Margin = new Padding(0);
         ExplorerLabel.Name = "ExplorerLabel";
         ExplorerLabel.Size = new Size(66, 20);
         ExplorerLabel.TabIndex = 11;
@@ -1322,7 +1262,6 @@ partial class MainWindow
         AllView.FullRowSelect = true;
         AllView.HeaderStyle = ColumnHeaderStyle.None;
         AllView.Location = new Point(0, 33);
-        AllView.Margin = new Padding(0);
         AllView.Name = "AllView";
         AllView.Size = new Size(244, 285);
         AllView.TabIndex = 10;
@@ -1341,7 +1280,6 @@ partial class MainWindow
         CategoryView.FullRowSelect = true;
         CategoryView.HeaderStyle = ColumnHeaderStyle.None;
         CategoryView.Location = new Point(0, 33);
-        CategoryView.Margin = new Padding(0);
         CategoryView.Name = "CategoryView";
         CategoryView.Size = new Size(244, 285);
         CategoryView.TabIndex = 12;
@@ -1360,7 +1298,6 @@ partial class MainWindow
         BinaryView.FullRowSelect = true;
         BinaryView.HeaderStyle = ColumnHeaderStyle.None;
         BinaryView.Location = new Point(0, 33);
-        BinaryView.Margin = new Padding(0);
         BinaryView.Name = "BinaryView";
         BinaryView.Size = new Size(244, 285);
         BinaryView.TabIndex = 13;
@@ -1379,7 +1316,6 @@ partial class MainWindow
         SIView.FullRowSelect = true;
         SIView.HeaderStyle = ColumnHeaderStyle.None;
         SIView.Location = new Point(0, 33);
-        SIView.Margin = new Padding(0);
         SIView.Name = "SIView";
         SIView.Size = new Size(244, 285);
         SIView.TabIndex = 14;
@@ -1398,7 +1334,6 @@ partial class MainWindow
         EquivalentsView.FullRowSelect = true;
         EquivalentsView.HeaderStyle = ColumnHeaderStyle.None;
         EquivalentsView.Location = new Point(0, 33);
-        EquivalentsView.Margin = new Padding(0);
         EquivalentsView.Name = "EquivalentsView";
         EquivalentsView.Size = new Size(244, 285);
         EquivalentsView.TabIndex = 15;
@@ -1417,7 +1352,6 @@ partial class MainWindow
         TemperatureView.FullRowSelect = true;
         TemperatureView.HeaderStyle = ColumnHeaderStyle.None;
         TemperatureView.Location = new Point(0, 33);
-        TemperatureView.Margin = new Padding(0);
         TemperatureView.Name = "TemperatureView";
         TemperatureView.Size = new Size(244, 285);
         TemperatureView.TabIndex = 16;
